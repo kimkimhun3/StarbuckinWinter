@@ -26,7 +26,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             />
           ),
           a: ({ node, ...props }) => (
-            
+            <a
               {...props}
               className="text-indigo-600 hover:text-indigo-800 underline"
               target={props.href?.startsWith('http') ? '_blank' : undefined}

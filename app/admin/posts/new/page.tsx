@@ -136,22 +136,18 @@ export default function NewPostPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Content * (Markdown)
               </label>
-              <MarkdownEditor
-                value={formData.content}
-                onChange={(content) => setFormData({ ...formData, content })}
-                placeholder="# My Awesome Trip
+<MarkdownEditor
+  value={formData.content}
+  onChange={(content) => setFormData({ ...formData, content })}
+  placeholder={`# Welcome to Tokyo!
 
-Write your travel story here in **Markdown** format!
+Start writing your amazing travel story here...
 
-## Day 1
-- Visited Tokyo Tower
-- Tried amazing ramen
-```javascript
-console.log('Hello from Tokyo!');
-```
-
-![Photo](https://example.com/photo.jpg)"
-              />
+## Tips:
+- Use **bold** and *italic* for emphasis
+- Add images with ![alt](url)
+- Create code blocks with triple backticks`}
+/>
             </div>
           </div>
 

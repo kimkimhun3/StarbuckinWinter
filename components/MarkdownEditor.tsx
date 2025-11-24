@@ -1,13 +1,18 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import SimpleMDE from 'react-simplemde-editor'
-import 'easymde/dist/easymde.min.css'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
+import 'easymde/dist/easymde.min.css'
 import 'highlight.js/styles/github-dark.css'
+
+// Import SimpleMDE dynamically to avoid SSR issues
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
+  ssr: false,
+})
 
 interface MarkdownEditorProps {
   value: string
@@ -27,10 +32,22 @@ export default function MarkdownEditor({
     setMounted(true)
   }, [])
 
-  const options = {
+  // Memoize onChange to prevent re-renders
+  const handleChange = useCallback(
+    (value: string) => {
+      onChange(value)
+    },
+    [onChange]
+  )
+
+  // Memoize options to prevent SimpleMDE from re-initializing
+const options = useMemo(
+  () => ({
     spellChecker: false,
     placeholder,
     status: false,
+    autofocus: false,
+    maxHeight: "600px", // Add explicit max height
     toolbar: [
       'bold',
       'italic',
@@ -44,19 +61,16 @@ export default function MarkdownEditor({
       'image',
       '|',
       'code',
-      'preview',
       '|',
       'guide',
     ],
-    previewRender: (text: string) => {
-      setShowPreview(true)
-      return text
-    },
-  }
+  }),
+  [placeholder]
+)
 
   if (!mounted) {
     return (
-      <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+      <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 min-h-[400px]">
         <p className="text-gray-500">Loading editor...</p>
       </div>
     )
@@ -95,7 +109,7 @@ export default function MarkdownEditor({
       {/* Editor / Preview */}
       {!showPreview ? (
         <div className="markdown-editor">
-          <SimpleMDE value={value} onChange={onChange} options={options} />
+          <SimpleMDE value={value} onChange={handleChange} options={options} />
         </div>
       ) : (
         <div className="border border-gray-300 rounded-lg p-6 bg-white min-h-[400px]">
@@ -112,21 +126,23 @@ export default function MarkdownEditor({
 
       {/* Markdown Cheatsheet */}
       <details className="text-sm text-gray-600">
-        <summary className="cursor-pointer font-medium">Markdown Cheatsheet</summary>
-        <div className="mt-2 space-y-2 pl-4">
-          <p><code># Heading 1</code> - Large heading</p>
-          <p><code>## Heading 2</code> - Medium heading</p>
-          <p><code>### Heading 3</code> - Small heading</p>
-          <p><code>**bold text**</code> - Bold text</p>
-          <p><code>*italic text*</code> - Italic text</p>
-          <p><code>[Link text](url)</code> - Hyperlink</p>
-          <p><code>![Alt text](image-url)</code> - Image</p>
-          <p><code>`code`</code> - Inline code</p>
-          <p><code>```language</code> - Code block (replace language with js, python, etc.)</p>
-          <p><code>- Item</code> - Bullet list</p>
-          <p><code>1. Item</code> - Numbered list</p>
-          <p><code>&gt; Quote</code> - Blockquote</p>
-          <p><code>---</code> - Horizontal rule</p>
+        <summary className="cursor-pointer font-medium hover:text-gray-900">
+          📝 Markdown Cheatsheet
+        </summary>
+        <div className="mt-2 space-y-1 pl-4 text-xs bg-gray-50 p-3 rounded-md">
+          <p><code className="bg-gray-200 px-1 rounded"># Heading 1</code> - Large heading</p>
+          <p><code className="bg-gray-200 px-1 rounded">## Heading 2</code> - Medium heading</p>
+          <p><code className="bg-gray-200 px-1 rounded">### Heading 3</code> - Small heading</p>
+          <p><code className="bg-gray-200 px-1 rounded">**bold text**</code> - Bold text</p>
+          <p><code className="bg-gray-200 px-1 rounded">*italic text*</code> - Italic text</p>
+          <p><code className="bg-gray-200 px-1 rounded">[Link text](url)</code> - Hyperlink</p>
+          <p><code className="bg-gray-200 px-1 rounded">![Alt text](image-url)</code> - Image</p>
+          <p><code className="bg-gray-200 px-1 rounded">`code`</code> - Inline code</p>
+          <p><code className="bg-gray-200 px-1 rounded">```language</code> - Code block (js, python, etc.)</p>
+          <p><code className="bg-gray-200 px-1 rounded">- Item</code> - Bullet list</p>
+          <p><code className="bg-gray-200 px-1 rounded">1. Item</code> - Numbered list</p>
+          <p><code className="bg-gray-200 px-1 rounded">&gt; Quote</code> - Blockquote</p>
+          <p><code className="bg-gray-200 px-1 rounded">---</code> - Horizontal rule</p>
         </div>
       </details>
     </div>

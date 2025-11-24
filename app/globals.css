@@ -1,64 +1,120 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Markdown Editor Styling - Fixed with Scrolling */
+.markdown-editor .EasyMDEContainer {
+  position: relative;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-
-/* Markdown Editor Styling */
 .markdown-editor .EasyMDEContainer .CodeMirror {
-  min-height: 400px;
+  min-height: 450px;
+  max-height: 600px; /* Allow scrolling beyond this */
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-family: 'Courier New', Courier, monospace;
+  border-radius: 0 0 0.5rem 0.5rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 8px;
+  background-color: #ffffff;
+  color: #1f2937 !important;
+  overflow-y: auto !important; /* Enable vertical scrolling */
 }
 
-.markdown-editor .EasyMDEContainer .CodeMirror-scroll {
-  min-height: 400px;
+.markdown-editor .CodeMirror-scroll {
+  min-height: 450px;
+  max-height: 600px;
+  overflow-y: auto !important; /* Enable scrolling */
+  overflow-x: auto !important;
 }
 
+.markdown-editor .CodeMirror-vscrollbar {
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+}
+
+.markdown-editor .CodeMirror-hscrollbar {
+  overflow-x: scroll !important;
+  overflow-y: hidden !important;
+}
+
+/* Fix cursor and selection colors */
+.markdown-editor .CodeMirror-cursor {
+  border-left: 2px solid #1f2937 !important;
+}
+
+.markdown-editor .CodeMirror-selected {
+  background-color: #dbeafe !important;
+}
+
+.markdown-editor .CodeMirror-line {
+  color: #1f2937 !important;
+}
+
+/* Toolbar styling */
 .markdown-editor .editor-toolbar {
   border: 1px solid #d1d5db;
   border-bottom: none;
   border-radius: 0.5rem 0.5rem 0 0;
   background-color: #f9fafb;
+  padding: 8px;
 }
 
 .markdown-editor .editor-toolbar button {
-  color: #374151;
+  color: #374151 !important;
+  border: none !important;
+  background-color: transparent;
 }
 
-.markdown-editor .editor-toolbar button:hover,
+.markdown-editor .editor-toolbar button:hover {
+  background-color: #e5e7eb !important;
+  border-color: transparent !important;
+}
+
 .markdown-editor .editor-toolbar button.active {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
 }
 
-/* Code block styling */
+.markdown-editor .editor-toolbar i.separator {
+  border-left: 1px solid #d1d5db;
+  border-right: none;
+}
+
+/* Markdown syntax highlighting in editor */
+.markdown-editor .cm-header {
+  color: #1e40af !important;
+  font-weight: bold;
+}
+
+.markdown-editor .cm-strong {
+  font-weight: bold;
+  color: #1f2937 !important;
+}
+
+.markdown-editor .cm-em {
+  font-style: italic;
+  color: #1f2937 !important;
+}
+
+.markdown-editor .cm-link {
+  color: #2563eb !important;
+  text-decoration: underline;
+}
+
+.markdown-editor .cm-url {
+  color: #7c3aed !important;
+}
+
+.markdown-editor .cm-quote {
+  color: #6b7280 !important;
+  font-style: italic;
+}
+
+/* Code block styling in preview */
 .prose pre {
-  background-color: #1e1e1e;
+  background-color: #1e1e1e !important;
   border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
 }
 
 .prose code {
@@ -66,10 +122,94 @@ body {
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
   font-size: 0.875em;
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .prose pre code {
   background-color: transparent;
   padding: 0;
-  color: #e5e7eb;
+  color: #e5e7eb !important;
+  font-weight: normal;
+}
+
+/* Image styling in preview */
+.prose img {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Link styling in preview */
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose a:hover {
+  color: #1e40af;
+}
+
+/* Table styling in preview */
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.prose td {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* Blockquote styling */
+.prose blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #6b7280;
+}
+
+/* Custom scrollbar for better UX */
+.markdown-editor .CodeMirror-vscrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.markdown-editor .CodeMirror-vscrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.markdown-editor .CodeMirror-vscrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.markdown-editor .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.markdown-editor .CodeMirror-hscrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-editor .CodeMirror-hscrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.markdown-editor .CodeMirror-hscrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.markdown-editor .CodeMirror-hscrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
