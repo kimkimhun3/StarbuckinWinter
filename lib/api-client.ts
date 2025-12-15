@@ -92,6 +92,27 @@ export class ApiClient {
       method: 'DELETE',
     })
   }
+
+  // Add this method to the ApiClient class
+  async getPostBySlug(slug: string) {
+    return this.request(`/api/posts/slug/${slug}`)
+  }
+
+  // Also add method for public posts (no auth needed)
+  async getPublicPosts() {
+    return this.request('/api/posts')
+  }
+
+  // Add method to create comment
+  async createComment(postId: string, content: string) {
+    return this.request('/api/comments', {
+      method: 'POST',
+      body: JSON.stringify({ postId, content }),
+    })
+  }
 }
+
+
+
 
 export const apiClient = new ApiClient()

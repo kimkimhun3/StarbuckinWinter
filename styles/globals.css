@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400;500;600&display=swap');
+
+* {
+  font-family: 'Noto Serif JP', serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  background-color: #F5F1E8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes charAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+    filter: blur(5px);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-charAppear {
+  animation: charAppear 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
+
+.animate-fadeInLeft {
+  animation: fadeInLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeInRight {
+  animation: fadeInRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .fixed.top-20.right-8 h1 {
+    font-size: 60px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .fixed.top-8.left-8 {
+    top: 1.5rem !important;
+    left: 1.5rem !important;
+  }
+
+  .fixed.top-8.left-8 > div:first-child {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+
+  .fixed.top-56.left-8 {
+    top: 12rem !important;
+    left: 1.5rem !important;
+    font-size: 14px !important;
+  }
+
+  .fixed.top-20.right-8 {
+    top: 2rem !important;
+    right: 1.5rem !important;
+  }
+
+  .fixed.top-20.right-8 h1 {
+    font-size: 48px !important;
+  }
+
+  /* Stack sections on mobile */
+  .grid.md\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid.md\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .fixed.top-20.right-8 h1 {
+    font-size: 36px !important;
+  }
+
+  .text-4xl,
+  .md\:text-5xl {
+    font-size: 1.875rem !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F1E8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4CFC4;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B4AFA4;
+}
+
+
