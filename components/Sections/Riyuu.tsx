@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import AnimatedVerticalTitle from '../UI/Animatedverticaltitle';
 
 type RevealProps = {
   children: React.ReactNode;
@@ -47,19 +48,30 @@ function Reveal({ children, delay = 0 }: RevealProps) {
 // Wavy line decoration component
 function WavyLine() {
   return (
-    <svg 
-      viewBox="0 0 1200 40" 
-      className="w-full h-8 opacity-30"
-      fill="none"
-      preserveAspectRatio="none"
-    >
-      <path 
-        d="M0 20 Q 150 5, 300 20 T 600 20 T 900 20 T 1200 20" 
-        stroke="#3D3D3D" 
-        strokeWidth="1.5"
-        fill="none"
-      />
-    </svg>
+    <>
+      <div className="relative w-full h-8 overflow-hidden opacity-30">
+        <svg 
+          viewBox="0 0 2400 40" 
+          className="absolute inset-0 w-full h-full"
+          fill="none"
+          preserveAspectRatio="none"
+        >
+          <path 
+            className="animate-wave-shape"
+            stroke="#3D3D3D" 
+            strokeWidth="1.5"
+            fill="none"
+          >
+            <animate
+              attributeName="d"
+              values="M0 20 Q 150 5, 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20;M0 20 Q 150 10, 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20;M0 20 Q 150 15, 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20;M0 20 Q 150 10, 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20;M0 20 Q 150 5, 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </path>
+        </svg>
+      </div>
+    </>
   );
 }
 
@@ -72,20 +84,11 @@ export default function RiyuuSection() {
         {/* Vertical Japanese Title - Centered */}
         <Reveal>
           <div className="flex justify-center mb-12 md:mb-16">
-            <div className="flex items-start gap-1">
-              <div 
-                className="text-[32px] md:text-[40px] font-light text-[#3D3D3D] tracking-wider"
-                style={{ writingMode: 'vertical-rl', letterSpacing: '0.15em' }}
-              >
-                その後
-              </div>
-              <div 
-                className="text-[32px] md:text-[40px] font-light text-[#3D3D3D] tracking-wider"
-                style={{ writingMode: 'vertical-rl', letterSpacing: '0.15em' }}
-              >
-                旅の
-              </div>
-            </div>
+          <AnimatedVerticalTitle 
+            words={[ 'するの', 'なぜたび']} 
+            initialDelay={0.5}
+            barHeights={[160, 250]}
+          />
           </div>
         </Reveal>
 
@@ -283,6 +286,7 @@ export default function RiyuuSection() {
           </div>
         </Reveal>
       </div>
+      <WavyLine />
     </section>
   );
 }

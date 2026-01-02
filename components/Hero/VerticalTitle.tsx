@@ -1,25 +1,65 @@
-interface VerticalTitleProps {
-  variant?: 'hero' | 'inline';
-}
-
-export default function VerticalTitle({ variant = 'hero' }: VerticalTitleProps) {
+export default function VerticalTitle() {
   return (
     <>
-      {variant === 'hero' ? (
-        <div
-          className="absolute top-6 right-4 md:right-6 lg:right-8 xl:right-24 2xl:right-32 z-30 pr-0 md:pr-0 lg:pr-6 xl:pr-16 2xl:pr-20 animate-fadeIn"
-          style={{ animationDelay: '2.6s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          <VerticalTitleContent />
+      <div className="absolute top-6 right-4 md:right-6 lg:right-8 xl:right-24 2xl:right-32 z-30 pr-0 md:pr-0 lg:pr-6 xl:pr-16 2xl:pr-20 animate-fadeIn" style={{ animationDelay: '2.6s', opacity: 0, animationFillMode: 'forwards' }}>
+        {/* Container - reads right to left */}
+        <div className="flex items-end gap-0.5 md:gap-1 lg:gap-1.5 xl:gap-2">
+          
+          {/* First: つくる (will be on the left) */}
+          <h1 
+            className="text-[60px] font-light text-[#3D3D3D] leading-none"
+            style={{ 
+              writingMode: 'vertical-rl',
+              letterSpacing: '0.15em',
+              lineHeight: '1.1'
+            }}
+          >
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '3.6s', opacity: 0, animationFillMode: 'forwards' }}>み</span>
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '3.8s', opacity: 0, animationFillMode: 'forwards' }}>ち</span>
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '4.0s', opacity: 0, animationFillMode: 'forwards' }}>へ</span>
+          </h1>
+          
+          {/* First vertical bar - grows from bottom */}
+          <div 
+            className="w-[2px] bg-[#3D3D3D] animate-lineGrow self-end origin-bottom" 
+            style={{ 
+              animationDelay: '4.5s',
+              height: '210px',
+              opacity: 0,
+              transform: 'scaleY(0)',
+              animationFillMode: 'forwards'
+            }}
+          ></div>
+
+          {/* Second: つづきを (will be on the right) */}
+          <h1 
+            className="text-[60px] font-light text-[#3D3D3D] leading-none"
+            style={{ 
+              writingMode: 'vertical-rl',
+              letterSpacing: '0.15em',
+              lineHeight: '1.1'
+            }}
+          >
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '2.8s', opacity: 0, animationFillMode: 'forwards' }}>し</span>
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '3.0s', opacity: 0, animationFillMode: 'forwards' }}>ら</span>
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '3.2s', opacity: 0, animationFillMode: 'forwards' }}>な</span>
+            <span className="inline-block animate-charAppear" style={{ animationDelay: '3.4s', opacity: 0, animationFillMode: 'forwards' }}>い</span>
+          </h1>
+
+          {/* Second vertical bar - grows from bottom */}
+          <div 
+            className="w-[2px] bg-[#3D3D3D] animate-lineGrow self-end origin-bottom" 
+            style={{ 
+              animationDelay: '4.0s',
+              height: '290px',
+              opacity: 0,
+              transform: 'scaleY(0)',
+              animationFillMode: 'forwards'
+            }}
+          ></div>
+
         </div>
-      ) : (
-        <div
-          className="animate-fadeIn"
-          style={{ animationDelay: '0.4s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          <VerticalTitleContent />
-        </div>
-      )}
+      </div>
 
       {/* Styles */}
       <style jsx>{`
@@ -75,99 +115,5 @@ export default function VerticalTitle({ variant = 'hero' }: VerticalTitleProps) 
         }
       `}</style>
     </>
-  );
-}
-
-function VerticalTitleContent() {
-  return (
-    <div className="flex items-end gap-0.5 md:gap-1 lg:gap-1.5 xl:gap-2">
-      {/* First: つくる (will be on the left) */}
-      <h1
-        className="text-[48px] md:text-[56px] lg:text-[60px] font-light text-[#3D3D3D] leading-none"
-        style={{
-          writingMode: 'vertical-rl',
-          letterSpacing: '0.15em',
-          lineHeight: '1.1',
-        }}
-      >
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '3.6s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          み
-        </span>
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '3.8s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          ち
-        </span>
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '4.0s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          へ
-        </span>
-      </h1>
-
-      {/* First vertical bar - grows from bottom */}
-      <div
-        className="w-[3px] bg-[#3D3D3D] animate-lineGrow self-end origin-bottom"
-        style={{
-          animationDelay: '3.8s',
-          height: '210px',
-          opacity: 0,
-          transform: 'scaleY(0)',
-          animationFillMode: 'forwards',
-        }}
-      ></div>
-
-      {/* Second: つづきを (will be on the right) */}
-      <h1
-        className="text-[48px] md:text-[56px] lg:text-[60px] font-light text-[#3D3D3D] leading-none"
-        style={{
-          writingMode: 'vertical-rl',
-          letterSpacing: '0.15em',
-          lineHeight: '1.1',
-        }}
-      >
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '2.8s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          し
-        </span>
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '3.0s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          ら
-        </span>
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '3.2s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          な
-        </span>
-        <span
-          className="inline-block animate-charAppear"
-          style={{ animationDelay: '3.4s', opacity: 0, animationFillMode: 'forwards' }}
-        >
-          い
-        </span>
-      </h1>
-
-      {/* Second vertical bar - grows from bottom */}
-      <div
-        className="w-[3px] bg-[#3D3D3D] animate-lineGrow self-end origin-bottom"
-        style={{
-          animationDelay: '4.0s',
-          height: '290px',
-          opacity: 0,
-          transform: 'scaleY(0)',
-          animationFillMode: 'forwards',
-        }}
-      ></div>
-    </div>
   );
 }

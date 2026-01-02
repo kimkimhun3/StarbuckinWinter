@@ -13,7 +13,8 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, redirectTo?: string) => Promise<void>
+  register: (email: string, password: string, name: string, redirectTo?: string) => Promise<void>
   logout: () => void
   isLoading: boolean
 }
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirectTo?: string) => {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -63,8 +64,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data.user.role === 'ADMIN') {
       router.push('/admin/dashboard')
     } else {
-      router.push('/')
+      // For regular users, redirect to the specified page or home
+      router.push(redirectTo || '/')
     }
+  }
+
+  const register = async (email: string, password: string, name: string, redirectTo?: string) => {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, name }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Registration failed')
+    }
+
+    const data = await response.json()
+    
+    setToken(data.token)
+    setUser(data.user)
+    
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+    
+    // After registration, redirect to the specified page or home
+    router.push(redirectTo || '/')
   }
 
   const logout = () => {
@@ -76,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
