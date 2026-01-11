@@ -52,9 +52,9 @@ export default function MarkdownEditor({
         'italic',
         'strikethrough',
         '|',
-        'heading-1',
-        'heading-2',
-        'heading-3',
+        { name: 'heading-1', action: 'toggleHeading1', className: 'fa fa-header', title: 'Heading 1' },
+        { name: 'heading-2', action: 'toggleHeading2', className: 'fa fa-header', title: 'Heading 2' },
+        { name: 'heading-3', action: 'toggleHeading3', className: 'fa fa-header', title: 'Heading 3' },
         '|',
         'quote',
         'unordered-list',
@@ -71,7 +71,7 @@ export default function MarkdownEditor({
         'fullscreen',
         '|',
         'guide',
-      ],
+      ] as const,
     }),
     [placeholder]
   )
