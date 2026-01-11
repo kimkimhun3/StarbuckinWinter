@@ -23,7 +23,7 @@
     "easymde": "^2.20.0",
     "google-translate-api-x": "^10.7.2",
     "jsonwebtoken": "^9.0.2",
-    "next": "16.0.3",
+    "next": "16.0.10",
     "prisma": "^5.22.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
