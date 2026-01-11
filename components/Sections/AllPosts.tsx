@@ -48,6 +48,17 @@ function Reveal({ children, delay = 0 }: RevealProps) {
   );
 }
 
+// Helper function to format view count
+function formatViewCount(count: number): string {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`.replace('.0K', 'K');
+  }
+  return count.toString();
+}
+
 export default function AllPostsPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>([]);
@@ -171,7 +182,7 @@ export default function AllPostsPage() {
         )}
 
         {/* Posts Grid */}
-        <div className="rounded-xl  p-5 sm:p-7 md:p-9 lg:p-11 xl:p-12">
+        <div className="rounded-xl p-5 sm:p-7 md:p-9 lg:p-11 xl:p-12">
           {isLoading ? (
             // Loading Skeleton
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
@@ -192,13 +203,38 @@ export default function AllPostsPage() {
                 <Reveal key={post.id || index} delay={index * 100}>
                   <Link href={`/blog/${post.slug}`} className="block group">
                     <article className="space-y-4">
-                      {/* Post Image */}
+                      {/* Post Image with View Count Badge */}
                       <div className="relative w-full aspect-[4/3] overflow-hidden rounded-md shadow-sm">
                         <img
                           src={post.coverImage || defaultImage}
                           alt={post.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
+                        {/* View Count Badge - Top Right */}
+                        {post.viewCount !== undefined && (
+                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-medium">
+                            <svg 
+                              className="w-3.5 h-3.5" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" 
+                              />
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
+                              />
+                            </svg>
+                            <span>{formatViewCount(post.viewCount || 0)}</span>
+                          </div>
+                        )}
                       </div>
                       
                       {/* Post Content */}
@@ -221,13 +257,6 @@ export default function AllPostsPage() {
                             })}
                           </p>
                         )}
-                        
-                        {/* Read More Link */}
-                        <div className="pt-2">
-                          <span className="text-xs sm:text-sm text-[#3D3D3D] inline-block border-b border-[#3D3D3D] group-hover:border-[#5D5D5D] group-hover:text-[#5D5D5D] transition-colors pb-0.5">
-                            続きを読む
-                          </span>
-                        </div>
                       </div>
                     </article>
                   </Link>

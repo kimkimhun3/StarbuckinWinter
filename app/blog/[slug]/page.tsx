@@ -9,8 +9,6 @@ import TableOfContents from '@/components/TableOfContents'
 import Link from 'next/link'
 import ShareButton from '@/components/Hero/ShareButton'
 
-
-
 // Translation function using Next.js API route with Google Translate
 async function translateToJapanese(text: string, mode: 'title' | 'content' = 'title'): Promise<string> {
   try {
@@ -59,7 +57,6 @@ function extractHeadings(markdown: string): string[] {
   return headings
 }
 
-
 // BilingualTitle Component with dynamic divider height - Always side-by-side
 function BilingualTitle({ 
   japaneseTitle, 
@@ -99,7 +96,6 @@ function BilingualTitle({
             <div ref={japaneseRef} className="flex gap-1 sm:gap-2 md:gap-3" style={{ direction: 'rtl' }}>
               {(() => {
                 const chars = japaneseTitle.split('');
-                // Fixed: 8 characters per column
                 const charsPerColumn = 8;
                 const totalColumns = Math.ceil(chars.length / charsPerColumn);
                 const columns = [];
@@ -183,6 +179,14 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   const [isLoving, setIsLoving] = useState(false)
   const [hasLoved, setHasLoved] = useState(false)
 
+  // Load language preference from localStorage on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage') as 'en' | 'ja' | null
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage)
+    }
+  }, [])
+
   useEffect(() => {
     // Ensure fonts are loaded before rendering
     if (document.fonts) {
@@ -190,7 +194,6 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         setFontsLoaded(true)
       })
     } else {
-      // Fallback for browsers that don't support document.fonts
       setFontsLoaded(true)
     }
   }, [])
@@ -199,12 +202,46 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     loadPost()
   }, [slug])
 
+  // Auto-translate when post loads if user preference is Japanese
+  useEffect(() => {
+    const autoTranslate = async () => {
+      if (post && currentLanguage === 'ja' && !translatedContent) {
+        setIsTranslatingContent(true)
+        
+        // Translate content
+        const translated = await translateToJapanese(post.content, 'content')
+        setTranslatedContent(translated)
+        
+        // Create heading ID map
+        const englishHeadings = extractHeadings(post.content)
+        const japaneseHeadings = extractHeadings(translated)
+        
+        const map = new Map<string, string>()
+        japaneseHeadings.forEach((japHeading, index) => {
+          if (englishHeadings[index]) {
+            const id = generateSlug(englishHeadings[index])
+            map.set(japHeading, id)
+          }
+        })
+        
+        setHeadingIdMap(map)
+        setIsTranslatingContent(false)
+      }
+    }
+
+    autoTranslate()
+  }, [post, currentLanguage])
+
   const loadPost = async () => {
     try {
       const { post } = await apiClient.getPostBySlug(slug)
       setPost(post)
       setLoveCount(post.loveCount || 0)
       setViewCount(post.viewCount || 0)
+      
+      // Reset translated content when loading new post
+      setTranslatedContent('')
+      setHeadingIdMap(new Map())
       
       // Translate title to Japanese
       setIsTranslating(true)
@@ -258,14 +295,10 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   const loadRelatedPosts = async (currentPostId: string) => {
     try {
-      // Fetch all public posts
       const response = await apiClient.getPublicPosts()
       const allPosts = response.posts || []
       
-      // Filter out current post
       const otherPosts = allPosts.filter((p: any) => p.id !== currentPostId)
-      
-      // Shuffle and take 4 random posts
       const shuffled = otherPosts.sort(() => 0.5 - Math.random())
       const randomPosts = shuffled.slice(0, 4)
       
@@ -275,50 +308,40 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     }
   }
 
-const handleLanguageSwitch = async () => {
-  if (currentLanguage === 'en') {
-    // Switch to Japanese - translate content
-    if (!translatedContent) {
-      setIsTranslatingContent(true)
-      const translated = await translateToJapanese(post.content, 'content')
-      setTranslatedContent(translated)
-      
-      // Create heading ID map: Japanese text -> English ID
-      const englishHeadings = extractHeadings(post.content)
-      const japaneseHeadings = extractHeadings(translated)
-      
-      const map = new Map<string, string>()
-      
-      // Map each Japanese heading to its corresponding English ID
-      japaneseHeadings.forEach((japHeading, index) => {
-        if (englishHeadings[index]) {
-          const id = generateSlug(englishHeadings[index])
-          map.set(japHeading, id)  // Key is Japanese text, value is English ID
-        }
-      })
-      
-      setHeadingIdMap(map)
-      setIsTranslatingContent(false)
+  const handleLanguageSwitch = async () => {
+    if (currentLanguage === 'en') {
+      // Switch to Japanese
+      if (!translatedContent) {
+        setIsTranslatingContent(true)
+        const translated = await translateToJapanese(post.content, 'content')
+        setTranslatedContent(translated)
+        
+        // Create heading ID map
+        const englishHeadings = extractHeadings(post.content)
+        const japaneseHeadings = extractHeadings(translated)
+        
+        const map = new Map<string, string>()
+        japaneseHeadings.forEach((japHeading, index) => {
+          if (englishHeadings[index]) {
+            const id = generateSlug(englishHeadings[index])
+            map.set(japHeading, id)
+          }
+        })
+        
+        setHeadingIdMap(map)
+        setIsTranslatingContent(false)
+      }
+      setCurrentLanguage('ja')
+      // Save language preference
+      localStorage.setItem('preferredLanguage', 'ja')
+    } else {
+      // Switch back to English
+      setCurrentLanguage('en')
+      // Save language preference
+      localStorage.setItem('preferredLanguage', 'en')
     }
-    setCurrentLanguage('ja')
-  } else {
-    // Switch back to English
-    setCurrentLanguage('en')
   }
-}
 
-
-  useEffect(() => {
-  // if (!isTranslatingContent) {
-  //   setTimeout(() => {
-  //     console.log('Current language:', currentLanguage)
-  //     console.log('All headings with IDs:')
-  //     document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
-  //       console.log('  -', heading.textContent, '→ ID:', heading.id)
-  //     })
-  //   }, 500)
-  // }
-}, [currentLanguage, isTranslatingContent])
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -403,9 +426,6 @@ const handleLanguageSwitch = async () => {
           </>
         ) : (
           <>
-            {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-            </svg> */}
             <span className="font-medium text-sm">{currentLanguage === 'en' ? '日本語' : 'English'}</span>
           </>
         )}
@@ -455,138 +475,151 @@ const handleLanguageSwitch = async () => {
         {/* Post Content with Table of Contents */}
         <article className="mb-8">
           <div className="p-6 sm:p-8 md:p-12">
-{/* Post Meta Information - Single Line with Share Button */}
-<div className="pb-4 mb-6 border-b border-gray-200">
-  <div className="flex items-center justify-between gap-2">
-    {/* Left side - Meta info */}
-    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm overflow-hidden">
-      {/* Author - Always visible */}
-      <div className="flex items-center gap-1.5 min-w-0">
-        <div className="w-6 h-6 sm:w-7 sm:h-7 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-indigo-600 font-medium text-[10px] sm:text-xs">
-            {(post.authorName || post.author?.name || 'A')[0].toUpperCase()}
-          </span>
-        </div>
-        <span className="font-medium text-gray-900 truncate max-w-[80px] sm:max-w-none">
-          {post.authorName || post.author?.name || 'Anonymous'}
-        </span>
-      </div>
-      
-      <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
-      
-      {/* Date */}
-      <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
-        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <time className="hidden sm:inline">
-          {new Date(post.createdAt).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-          })}
-        </time>
-        <time className="sm:hidden text-[11px]">
-          {new Date(post.createdAt).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          })}
-        </time>
-      </div>
-      
-      <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
-      
-      {/* View Count */}
-      <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
-        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-        <span className="text-[11px] sm:text-xs">{viewCount}</span>
-      </div>
-      
-      <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
-      
-      {/* Comments Count */}
-      <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
-        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-        </svg>
-        <span className="text-[11px] sm:text-xs">{post.comments.length}</span>
-      </div>
-      
-      <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
-      
-      {/* Love Button */}
-      <button
-        onClick={handleLoveClick}
-        disabled={hasLoved || isLoving}
-        title={hasLoved ? 'You loved this post' : 'Love this post'}
-        className={`
-          flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 flex-shrink-0
-          ${hasLoved 
-            ? 'bg-red-50 text-red-600' 
-            : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
-          }
-          ${isLoving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        `}
-      >
-        <svg 
-          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${hasLoved ? 'fill-red-600' : 'fill-none'} transition-all`}
-          fill={hasLoved ? 'currentColor' : 'none'}
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-          />
-        </svg>
-        <span className="font-medium text-[11px] sm:text-xs">{loveCount}</span>
-      </button>
-    </div>
+            {/* Post Meta Information - Single Line with Share Button */}
+            <div className="pb-4 mb-6 border-b border-gray-200">
+              <div className="flex items-center justify-between gap-2">
+                {/* Left side - Meta info */}
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm overflow-hidden">
+                  {/* Author - Always visible */}
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-indigo-600 font-medium text-[10px] sm:text-xs">
+                        {(post.authorName || post.author?.name || 'A')[0].toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="font-medium text-gray-900 truncate max-w-[80px] sm:max-w-none">
+                      {post.authorName || post.author?.name || 'Anonymous'}
+                    </span>
+                  </div>
+                  
+                  <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
+                  
+                  {/* Date */}
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <time className="hidden sm:inline">
+                      {new Date(post.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </time>
+                    <time className="sm:hidden text-[11px]">
+                      {new Date(post.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </time>
+                  </div>
+                  
+                  <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
+                  
+                  {/* View Count */}
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span className="text-[11px] sm:text-xs">{viewCount}</span>
+                  </div>
+                  
+                  <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
+                  
+                  {/* Comments Count */}
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    <span className="text-[11px] sm:text-xs">{post.comments.length}</span>
+                  </div>
+                  
+                  <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
+                  
+                  {/* Love Button */}
+                  <button
+                    onClick={handleLoveClick}
+                    disabled={hasLoved || isLoving}
+                    title={hasLoved ? 'You loved this post' : 'Love this post'}
+                    className={`
+                      flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 flex-shrink-0
+                      ${hasLoved 
+                        ? 'bg-red-50 text-red-600' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
+                      }
+                      ${isLoving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                    `}
+                  >
+                    <svg 
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${hasLoved ? 'fill-red-600' : 'fill-none'} transition-all`}
+                      fill={hasLoved ? 'currentColor' : 'none'}
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                      />
+                    </svg>
+                    <span className="font-medium text-[11px] sm:text-xs">{loveCount}</span>
+                  </button>
+                </div>
 
-    {/* Right side - Share Button */}
-    <ShareButton 
-      url={typeof window !== 'undefined' ? window.location.href : ''}
-      title={post.title}
-      imageUrl={post.coverImage}
-    />
-  </div>
-</div>
+                {/* Right side - Share Button */}
+                <ShareButton 
+                  url={typeof window !== 'undefined' ? window.location.href : ''}
+                  title={post.title}
+                  imageUrl={post.coverImage}
+                />
+              </div>
+            </div>
 
             {/* Post Body with Table of Contents */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
               {/* Table of Contents - Sidebar on large desktop */}
-            <aside className="xl:col-span-3 hidden xl:block">
-              <TableOfContents 
-                key={currentLanguage} 
-                content={displayContent}
-                headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
-              />
-            </aside>
-
-              {/* Main Content */}
-              <div className="xl:col-span-8">
-                {/* Table of Contents - Mobile/Tablet (above content) */}
-              <div className="xl:hidden mb-6">
+              <aside className="xl:col-span-3 hidden xl:block">
                 <TableOfContents 
                   key={currentLanguage} 
                   content={displayContent}
                   headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
                 />
-              </div>
+              </aside>
 
-                {/* Post Body - Responsive Typography */}
-                <div className="prose-content">
-                  <MarkdownRenderer 
+              {/* Main Content */}
+              <div className="xl:col-span-8">
+                {/* Table of Contents - Mobile/Tablet (above content) */}
+                <div className="xl:hidden mb-6">
+                  <TableOfContents 
                     key={currentLanguage} 
                     content={displayContent}
                     headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
                   />
                 </div>
+
+                {/* Loading state while translating */}
+                {isTranslatingContent ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="text-center">
+                      <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <p className="text-gray-600">翻訳中...</p>
+                    </div>
+                  </div>
+                ) : (
+                  /* Post Body - Responsive Typography */
+                  <div className="prose-content">
+                    <MarkdownRenderer 
+                      key={currentLanguage} 
+                      content={displayContent}
+                      headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
