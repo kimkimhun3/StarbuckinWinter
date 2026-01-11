@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Post" ADD COLUMN     "authorName" TEXT,
+ADD COLUMN     "loveCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "viewCount" INTEGER NOT NULL DEFAULT 0;

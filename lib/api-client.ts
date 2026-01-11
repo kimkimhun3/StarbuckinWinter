@@ -50,6 +50,8 @@ export class ApiClient {
     excerpt?: string
     coverImage?: string
     published: boolean
+    authorName?: string
+    tags?: string[]
   }) {
     return this.request('/api/posts', {
       method: 'POST',
@@ -63,10 +65,24 @@ export class ApiClient {
     excerpt?: string
     coverImage?: string
     published: boolean
+    authorName?: string
+    tags?: string[]
   }) {
     return this.request(`/api/posts/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    })
+  }
+
+  async incrementLoveCount(id: string) {
+    return this.request(`/api/posts/${id}/love`, {
+      method: 'POST',
+    })
+  }
+
+  async incrementViewCount(id: string) {
+    return this.request(`/api/posts/${id}/view`, {
+      method: 'POST',
     })
   }
 

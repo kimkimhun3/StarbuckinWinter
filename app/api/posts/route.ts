@@ -68,12 +68,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { title, content, excerpt, coverImage, published } = await request.json()
+    const { title, content, excerpt, coverImage, published, authorName, tags } = await request.json()
 
     // Validate input
     if (!title || !content) {
       return NextResponse.json(
         { error: 'Title and content are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate tags (max 7 tags)
+    if (tags && Array.isArray(tags) && tags.length > 7) {
+      return NextResponse.json(
+        { error: 'Maximum 7 tags allowed' },
         { status: 400 }
       )
     }
@@ -95,7 +103,9 @@ export async function POST(request: NextRequest) {
         coverImage,
         published: published || false,
         publishedAt: published ? new Date() : null,
-        authorId: user.userId
+        authorId: user.userId,
+        authorName: authorName || null,
+        tags: tags && Array.isArray(tags) ? tags.filter((tag: string) => tag.trim().length > 0).slice(0, 7) : []
       },
       include: {
         author: {

@@ -8,9 +8,31 @@ import 'highlight.js/styles/github-dark.css'
 
 interface MarkdownRendererProps {
   content: string
+  headingIdMap?: Map<string, string> // Map of Japanese heading text to English ID
 }
 
-export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRendererProps) {
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+  }
+
+  const getHeadingId = (children: any): string => {
+    const text = children?.toString() || ''
+    
+    // If we have a heading ID map and this text is in it, use the mapped ID
+    if (headingIdMap && headingIdMap.has(text)) {
+      return headingIdMap.get(text)!
+    }
+    
+    // Otherwise, generate slug from the text (works for English)
+    return generateSlug(text)
+  }
+
   return (
     <article className="prose prose-slate lg:prose-lg xl:prose-xl max-w-none
       prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
@@ -44,7 +66,6 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
         components={{
           // Images - responsive and with lazy loading
           img: ({ node, ...props }) => {
-            // Check if width or height is specified
             const hasCustomSize = props.width || props.height;
             
             return (
@@ -85,7 +106,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             />
           ),
           
-          // Code blocks - with language label
+          // Code blocks
           pre: ({ node, ...props }) => (
             <div className="relative my-6">
               <pre
@@ -108,23 +129,38 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             return <code {...props} />;
           },
           
-          // Tables - enhanced styling
+          // Tables
           table: ({ node, ...props }) => (
             <div className="overflow-x-auto my-6 rounded-lg border border-gray-300">
               <table {...props} className="min-w-full divide-y divide-gray-300" />
             </div>
           ),
           
-          // Headings - with anchor links
-          h1: ({ node, ...props }) => (
-            <h1 {...props} className="text-4xl font-bold mb-6 mt-8 text-gray-900 leading-tight" />
-          ),
-          h2: ({ node, ...props }) => (
-            <h2 {...props} className="text-3xl font-bold mb-5 mt-8 pb-2 border-b border-gray-200 text-gray-900" />
-          ),
-          h3: ({ node, ...props }) => (
-            <h3 {...props} className="text-2xl font-bold mb-4 mt-6 text-gray-900" />
-          ),
+          // Headings - with mapped IDs
+          h1: ({ node, children, ...props }) => {
+            const id = getHeadingId(children)
+            return (
+              <h1 {...props} id={id} className="text-4xl font-bold mb-6 mt-8 text-gray-900 leading-tight scroll-mt-24">
+                {children}
+              </h1>
+            )
+          },
+          h2: ({ node, children, ...props }) => {
+            const id = getHeadingId(children)
+            return (
+              <h2 {...props} id={id} className="text-3xl font-bold mb-5 mt-8 pb-2 border-b border-gray-200 text-gray-900 scroll-mt-24">
+                {children}
+              </h2>
+            )
+          },
+          h3: ({ node, children, ...props }) => {
+            const id = getHeadingId(children)
+            return (
+              <h3 {...props} id={id} className="text-2xl font-bold mb-4 mt-6 text-gray-900 scroll-mt-24">
+                {children}
+              </h3>
+            )
+          },
           
           // Paragraphs
           p: ({ node, ...props }) => (

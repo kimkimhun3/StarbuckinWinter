@@ -14,9 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Travel Blog",
-  description: "Share your travel experiences",
-};
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: {
+    default: 'みちへしらない - Unknown Roads',
+    template: '%s | みちへしらない',
+  },
+  description: 'A bilingual travel blog exploring Japanese culture and destinations',
+  openGraph: {
+    type: 'website',
+    siteName: 'みちへしらない (Unknown Roads)',
+    locale: 'ja_JP',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: '@your_twitter_handle',
+  },
+}
 
 export default function RootLayout({
   children,

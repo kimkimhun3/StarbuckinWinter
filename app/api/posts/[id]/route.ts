@@ -83,7 +83,7 @@ export async function PUT(
       )
     }
 
-    const { title, content, excerpt, coverImage, published } = await request.json()
+    const { title, content, excerpt, coverImage, published, authorName, tags } = await request.json()
 
     // Check if post exists
     const existingPost = await prisma.post.findUnique({
@@ -97,6 +97,14 @@ export async function PUT(
       )
     }
 
+    // Validate tags (max 7 tags)
+    if (tags && Array.isArray(tags) && tags.length > 7) {
+      return NextResponse.json(
+        { error: 'Maximum 7 tags allowed' },
+        { status: 400 }
+      )
+    }
+
     // Update post
     const post = await prisma.post.update({
       where: { id },
@@ -106,7 +114,9 @@ export async function PUT(
         excerpt,
         coverImage,
         published,
-        publishedAt: published && !existingPost.published ? new Date() : existingPost.publishedAt
+        publishedAt: published && !existingPost.published ? new Date() : existingPost.publishedAt,
+        authorName: authorName || null,
+        tags: tags && Array.isArray(tags) ? tags.filter((tag: string) => tag.trim().length > 0).slice(0, 7) : []
       },
       include: {
         author: {

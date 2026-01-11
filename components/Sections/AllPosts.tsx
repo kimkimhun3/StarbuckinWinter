@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import AnimatedVerticalTitle from '@/components/UI/Animatedverticaltitle';
 
@@ -49,17 +50,36 @@ function Reveal({ children, delay = 0 }: RevealProps) {
 
 export default function AllPostsPage() {
   const [posts, setPosts] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const selectedTag = searchParams.get('tag') || null;
 
   useEffect(() => {
     loadPosts();
   }, []);
 
+  useEffect(() => {
+    // Filter posts when tag changes
+    if (selectedTag) {
+      const filtered = allPosts.filter((post) => 
+        post.tags && post.tags.includes(selectedTag)
+      );
+      setPosts(filtered);
+    } else {
+      setPosts(allPosts);
+    }
+  }, [selectedTag, allPosts]);
+
   const loadPosts = async () => {
     try {
-      const { posts: allPosts } = await apiClient.getPublicPosts();
+      const { posts: allPostsData } = await apiClient.getPublicPosts();
       // Get ALL posts (no slicing)
-      setPosts(allPosts);
+      setAllPosts(allPostsData);
+      if (!selectedTag) {
+        setPosts(allPostsData);
+      }
     } catch (error) {
       console.error('Failed to load posts:', error);
     } finally {
@@ -67,7 +87,29 @@ export default function AllPostsPage() {
     }
   };
 
+  // Get all unique tags from all posts
+  const getAllTags = () => {
+    const tagSet = new Set<string>();
+    allPosts.forEach((post) => {
+      if (post.tags && Array.isArray(post.tags)) {
+        post.tags.forEach((tag: string) => tagSet.add(tag));
+      }
+    });
+    return Array.from(tagSet).sort();
+  };
+
+  const handleTagClick = (tag: string) => {
+    if (selectedTag === tag) {
+      // Clear filter if clicking the same tag
+      router.push('/all');
+    } else {
+      router.push(`/all?tag=${encodeURIComponent(tag)}`);
+    }
+  };
+
   const defaultImage = "https://cdn-imgix.headout.com/media/images/22fba69863f7d95408b199a4796db8e8-Fujinomiya%205th%20Station.jpg?auto=format&w=1222.3999999999999&h=687.6&q=90&ar=16%3A9&crop=faces&fit=crop";
+
+  const allTags = getAllTags();
 
   return (
     <section className="bg-[#F5F1E8] min-h-screen py-10 sm:py-14 md:py-18 lg:py-22 xl:py-24">
@@ -82,8 +124,54 @@ export default function AllPostsPage() {
           />
         </div>
 
+        {/* Tags Filter */}
+        {!isLoading && allTags.length > 0 && (
+          <Reveal delay={100}>
+            <div className="mb-8 sm:mb-10 md:mb-12">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="text-sm sm:text-base font-medium text-[#3D3D3D]">Tags:</span>
+                <button
+                  onClick={() => router.push('/all')}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    !selectedTag
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-[#3D3D3D] hover:bg-gray-100 border border-gray-300'
+                  }`}
+                >
+                  All
+                </button>
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagClick(tag)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      selectedTag === tag
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-white text-[#3D3D3D] hover:bg-gray-100 border border-gray-300'
+                    }`}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+              {selectedTag && (
+                <div className="text-sm text-[#5D5D5D]">
+                  Showing posts tagged with: <span className="font-semibold text-[#3D3D3D]">#{selectedTag}</span>
+                  {' '}
+                  <button
+                    onClick={() => router.push('/all')}
+                    className="text-indigo-600 hover:text-indigo-800 underline"
+                  >
+                    Clear filter
+                  </button>
+                </div>
+              )}
+            </div>
+          </Reveal>
+        )}
+
         {/* Posts Grid */}
-        <div className="bg-white rounded-xl  p-5 sm:p-7 md:p-9 lg:p-11 xl:p-12">
+        <div className="rounded-xl  p-5 sm:p-7 md:p-9 lg:p-11 xl:p-12">
           {isLoading ? (
             // Loading Skeleton
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
