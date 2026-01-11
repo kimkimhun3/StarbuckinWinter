@@ -76,20 +76,17 @@ export default function TableOfContents({ content, headingIdMap }: TableOfConten
 
       observer = new IntersectionObserver(
         (entries) => {
-          // Find the entry that is most visible
-          let maxRatio = 0
-          let mostVisibleEntry: IntersectionObserverEntry | null = null
+          const visibleEntries = entries.filter(
+            (entry) => entry.isIntersecting
+          )
 
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-              maxRatio = entry.intersectionRatio
-              mostVisibleEntry = entry
-            }
-          })
+          if (visibleEntries.length === 0) return
 
-          if (mostVisibleEntry) {
-            setActiveId(mostVisibleEntry.target.id)
-          }
+          const mostVisibleEntry = visibleEntries.reduce((prev, curr) =>
+            curr.intersectionRatio > prev.intersectionRatio ? curr : prev
+          )
+
+          setActiveId((mostVisibleEntry.target as HTMLElement).id)
         },
         {
           rootMargin: '-20% 0px -80% 0px',
