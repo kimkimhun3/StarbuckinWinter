@@ -84,7 +84,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Translation error:', error)
     return NextResponse.json(
-      { translation: text, error: 'Translation failed, using original text' },
+      { translation: Text, error: 'Translation failed, using original text' },
       { status: 200 }
     )
   }
