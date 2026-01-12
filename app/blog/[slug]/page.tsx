@@ -4,13 +4,13 @@ import { useEffect, useState, use, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { apiClient } from '@/lib/api-client'
 import PublicNav from '@/components/PublicNav'
-import MarkdownRenderer from '@/components/MarkdownRenderer'
+import ProgressiveContent from '@/components/ProgressiveContent'
 import TableOfContents from '@/components/TableOfContents'
 import Link from 'next/link'
 import ShareButton from '@/components/Hero/ShareButton'
 
-// Translation function using Next.js API route with Google Translate
-async function translateToJapanese(text: string, mode: 'title' | 'content' = 'title'): Promise<string> {
+// Translation function using Next.js API route with Google Translate (only for content)
+async function translateToJapanese(text: string, mode: 'content' = 'content'): Promise<string> {
   try {
     const response = await fetch('/api/translate', {
       method: 'POST',
@@ -29,6 +29,35 @@ async function translateToJapanese(text: string, mode: 'title' | 'content' = 'ti
   } catch (error) {
     console.error('Translation failed:', error)
     return text // Fallback to original text
+  }
+}
+
+// Helper function to parse bilingual title
+// Format: "English Title | 日本語タイトル"
+function parseBilingualTitle(title: string): { english: string; japanese: string } {
+  // Support multiple delimiter formats:
+  // "English Title | 日本語タイトル"
+  // "English Title / 日本語タイトル"
+  // "English Title - 日本語タイトル"
+  
+  const delimiters = ['|', '/', ' - ']
+  
+  for (const delimiter of delimiters) {
+    if (title.includes(delimiter)) {
+      const parts = title.split(delimiter).map(part => part.trim())
+      if (parts.length >= 2) {
+        return {
+          english: parts[0],
+          japanese: parts[1]
+        }
+      }
+    }
+  }
+  
+  // If no delimiter found, return the whole title for both (fallback)
+  return {
+    english: title,
+    japanese: title
   }
 }
 
@@ -57,15 +86,13 @@ function extractHeadings(markdown: string): string[] {
   return headings
 }
 
-// BilingualTitle Component with dynamic divider height - Always side-by-side
+// BilingualTitle Component - Japanese (vertical) | English (horizontal)
 function BilingualTitle({ 
   japaneseTitle, 
-  englishTitle, 
-  isTranslating 
+  englishTitle
 }: { 
   japaneseTitle: string
   englishTitle: string
-  isTranslating: boolean
 }) {
   const japaneseRef = useRef<HTMLDivElement>(null)
   const englishRef = useRef<HTMLDivElement>(null)
@@ -83,51 +110,47 @@ function BilingualTitle({
     window.addEventListener('resize', updateDividerHeight)
     
     return () => window.removeEventListener('resize', updateDividerHeight)
-  }, [japaneseTitle, englishTitle, isTranslating])
+  }, [japaneseTitle, englishTitle])
 
   return (
     <div className="relative max-w-6xl mx-auto px-2 sm:px-4">
       <div className="flex items-start w-full">
         {/* LEFT SIDE - Japanese Title (Vertical) */}
         <div className="flex-1 flex justify-end pr-3 sm:pr-6 md:pr-8 lg:pr-12">
-          {isTranslating ? (
-            <div className="animate-pulse bg-gray-200 h-48 sm:h-56 md:h-64 w-10 sm:w-12 md:w-16 rounded"></div>
-          ) : (
-            <div ref={japaneseRef} className="flex gap-1 sm:gap-2 md:gap-3" style={{ direction: 'rtl' }}>
-              {(() => {
-                const chars = japaneseTitle.split('');
-                const charsPerColumn = 8;
-                const totalColumns = Math.ceil(chars.length / charsPerColumn);
-                const columns = [];
-                
-                for (let i = 0; i < totalColumns; i++) {
-                  const columnChars = chars.slice(i * charsPerColumn, (i + 1) * charsPerColumn);
-                  if (columnChars.length > 0) {
-                    columns.push(columnChars);
-                  }
+          <div ref={japaneseRef} className="flex gap-1 sm:gap-2 md:gap-3" style={{ direction: 'rtl' }}>
+            {(() => {
+              const chars = japaneseTitle.split('');
+              const charsPerColumn = 8;
+              const totalColumns = Math.ceil(chars.length / charsPerColumn);
+              const columns = [];
+              
+              for (let i = 0; i < totalColumns; i++) {
+                const columnChars = chars.slice(i * charsPerColumn, (i + 1) * charsPerColumn);
+                if (columnChars.length > 0) {
+                  columns.push(columnChars);
                 }
-                
-                return columns.map((columnChars, colIndex) => (
-                  <div key={colIndex} className="flex flex-col">
-                    {columnChars.map((char, charIndex) => (
-                      <span
-                        key={charIndex}
-                        className="inline-block text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-serif text-gray-700"
-                        style={{
-                          fontFamily: "'Noto Serif JP', 'Yu Mincho', 'YuMincho', serif",
-                          writingMode: 'horizontal-tb',
-                          textOrientation: 'upright',
-                          lineHeight: '1.3',
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                  </div>
-                ));
-              })()}
-            </div>
-          )}
+              }
+              
+              return columns.map((columnChars, colIndex) => (
+                <div key={colIndex} className="flex flex-col">
+                  {columnChars.map((char, charIndex) => (
+                    <span
+                      key={charIndex}
+                      className="inline-block text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-serif text-gray-700"
+                      style={{
+                        fontFamily: "'Noto Serif JP', 'Yu Mincho', 'YuMincho', serif",
+                        writingMode: 'horizontal-tb',
+                        textOrientation: 'upright',
+                        lineHeight: '1.3',
+                      }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </div>
+              ));
+            })()}
+          </div>
         </div>
 
         {/* Vertical Divider Line - DYNAMIC HEIGHT */}
@@ -163,9 +186,11 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
   const [commentContent, setCommentContent] = useState('')
   const [isSubmittingComment, setIsSubmittingComment] = useState(false)
   const [commentSuccess, setCommentSuccess] = useState(false)
-  const [japaneseTitle, setJapaneseTitle] = useState('')
-  const [isTranslating, setIsTranslating] = useState(false)
   const [fontsLoaded, setFontsLoaded] = useState(false)
+  
+  // Parsed title state
+  const [englishTitle, setEnglishTitle] = useState('')
+  const [japaneseTitle, setJapaneseTitle] = useState('')
   
   // Language switching state
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'ja'>('en')
@@ -243,11 +268,10 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
       setTranslatedContent('')
       setHeadingIdMap(new Map())
       
-      // Translate title to Japanese
-      setIsTranslating(true)
-      const translated = await translateToJapanese(post.title, 'title')
-      setJapaneseTitle(translated)
-      setIsTranslating(false)
+      // Parse bilingual title - INSTANT! No API call needed
+      const { english, japanese } = parseBilingualTitle(post.title)
+      setEnglishTitle(english)
+      setJapaneseTitle(japanese)
       
       // Increment view count when post loads
       try {
@@ -439,12 +463,13 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             <div className="mb-4 sm:mb-6">
               <img
                 src={post.coverImage}
-                alt={post.title}
+                alt={englishTitle}
                 className="w-full h-auto"
                 style={{ 
                   maxHeight: '500px',
                   objectFit: 'contain',
                 }}
+                loading="eager"
               />
             </div>
 
@@ -460,11 +485,10 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
               </p>
             </div>
 
-            {/* Bilingual Title Section - Always Side by Side */}
+            {/* Bilingual Title Section - Japanese (Left/Vertical) | English (Right/Horizontal) */}
             <BilingualTitle 
               japaneseTitle={japaneseTitle} 
-              englishTitle={post.title}
-              isTranslating={isTranslating}
+              englishTitle={englishTitle}
             />
           </div>
         </div>
@@ -571,7 +595,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                 {/* Right side - Share Button */}
                 <ShareButton 
                   url={typeof window !== 'undefined' ? window.location.href : ''}
-                  title={post.title}
+                  title={englishTitle}
                   imageUrl={post.coverImage}
                 />
               </div>
@@ -611,12 +635,13 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                     </div>
                   </div>
                 ) : (
-                  /* Post Body - Responsive Typography */
+                  /* Post Body - WITH PROGRESSIVE LOADING & LAZY IMAGES */
                   <div className="prose-content">
-                    <MarkdownRenderer 
-                      key={currentLanguage} 
+                    <ProgressiveContent
+                      key={currentLanguage}
                       content={displayContent}
                       headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
+                      chunkSize={200} // Load 200 words at a time
                     />
                   </div>
                 )}
@@ -791,6 +816,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                           src={relatedPost.coverImage || defaultImage}
                           alt={relatedPost.title}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
                         />
                       </div>
                       

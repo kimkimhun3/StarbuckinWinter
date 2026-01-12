@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import 'highlight.js/styles/github-dark.css'
+import LazyImage from './LazyImage'
 
 interface MarkdownRendererProps {
   content: string
@@ -64,18 +65,19 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight, rehypeRaw]}
         components={{
-          // Images - responsive and with lazy loading
+          // Images - WITH LAZY LOADING (UPDATED!)
           img: ({ node, ...props }) => {
             const hasCustomSize = props.width || props.height;
             
             return (
-              <img
-                {...props}
+              <LazyImage
+                src={typeof props.src === 'string' ? props.src : (props.src ? URL.createObjectURL(props.src) : '')}
+                alt={props.alt || 'Blog image'}
+                width={props.width}
+                height={props.height}
                 className={`rounded-xl shadow-lg object-cover my-8 ${
                   hasCustomSize ? 'mx-auto' : 'w-full'
                 } h-auto`}
-                loading="lazy"
-                alt={props.alt || 'Blog image'}
                 style={{
                   maxWidth: '100%',
                   width: props.width ? `${props.width}` : undefined,
