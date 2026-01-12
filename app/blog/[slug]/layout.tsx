@@ -1,6 +1,32 @@
 import type { Metadata } from 'next'
 import { apiClient } from '@/lib/api-client'
 
+// Force dynamic rendering - don't pre-render at build time
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Revalidate every 60 seconds
+
+// Helper function to parse bilingual title
+function parseBilingualTitle(title: string): { english: string; japanese: string } {
+  const delimiters = ['|', '/', ' - ']
+  
+  for (const delimiter of delimiters) {
+    if (title.includes(delimiter)) {
+      const parts = title.split(delimiter).map(part => part.trim())
+      if (parts.length >= 2) {
+        return {
+          english: parts[0],
+          japanese: parts[1]
+        }
+      }
+    }
+  }
+  
+  return {
+    english: title,
+    japanese: title
+  }
+}
+
 // Generate metadata for SEO and social sharing
 export async function generateMetadata({ 
   params 
@@ -12,6 +38,9 @@ export async function generateMetadata({
   try {
     const { post } = await apiClient.getPostBySlug(slug)
     
+    // Parse bilingual title
+    const { english, japanese } = parseBilingualTitle(post.title)
+    
     // Create caption from post data
     const caption = `${new Date(post.createdAt).toLocaleDateString('ja-JP', {
       year: 'numeric',
@@ -19,27 +48,27 @@ export async function generateMetadata({
       day: 'numeric'
     })} · 中野 · 東京`
     
-    // Get the site URL from environment variable or use a default
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'
+    // Get the site URL from environment variable
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     const postUrl = `${siteUrl}/blog/${slug}`
     
     // Prepare the description
     const description = post.excerpt || post.description || caption
     
     return {
-      title: post.title,
+      title: `${english} | ${japanese}`, // Bilingual title in tab
       description: description,
       
       // Open Graph metadata for Facebook, LinkedIn, etc.
       openGraph: {
-        title: post.title,
+        title: english, // Use English title for OG
         description: caption, // Using caption for social preview
         images: [
           {
             url: post.coverImage || `${siteUrl}/default-og-image.jpg`,
             width: 1200,
             height: 630,
-            alt: post.title,
+            alt: english,
           },
         ],
         url: postUrl,
@@ -58,10 +87,9 @@ export async function generateMetadata({
       // Twitter Card metadata
       twitter: {
         card: 'summary_large_image',
-        title: post.title,
+        title: english,
         description: caption,
         images: [post.coverImage || `${siteUrl}/default-og-image.jpg`],
-        creator: '@your_twitter_handle', // Optional: Add your Twitter handle
       },
       
       // Additional metadata
@@ -70,10 +98,15 @@ export async function generateMetadata({
       },
     }
   } catch (error) {
-    console.error('Failed to generate metadata:', error)
+    // Silent fallback - don't log expected errors during development
+    const formattedSlug = slug
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+    
     return {
-      title: 'Post Not Found',
-      description: 'The blog post you are looking for could not be found.',
+      title: `${formattedSlug} | みちへしらない`,
+      description: 'Travel blog exploring Japan and beyond',
     }
   }
 }

@@ -3,7 +3,14 @@ export class ApiClient {
   private token: string | null
 
   constructor() {
-    this.baseUrl = ''
+    // Detect if running on server or client
+    if (typeof window === 'undefined') {
+      // SERVER-SIDE: Use full URL for API calls during SSR/build
+      this.baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    } else {
+      // CLIENT-SIDE: Use relative URLs (works in browser)
+      this.baseUrl = ''
+    }
     this.token = null
   }
 
@@ -109,17 +116,17 @@ export class ApiClient {
     })
   }
 
-  // Add this method to the ApiClient class
+  // Get post by slug
   async getPostBySlug(slug: string) {
     return this.request(`/api/posts/slug/${slug}`)
   }
 
-  // Also add method for public posts (no auth needed)
+  // Get public posts (no auth needed)
   async getPublicPosts() {
     return this.request('/api/posts')
   }
 
-  // Add method to create comment
+  // Create comment
   async createComment(postId: string, content: string) {
     return this.request('/api/comments', {
       method: 'POST',
@@ -127,8 +134,5 @@ export class ApiClient {
     })
   }
 }
-
-
-
 
 export const apiClient = new ApiClient()
