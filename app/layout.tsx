@@ -16,13 +16,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
-    default: 'みちへしらない - Unknown Roads',
-    template: '%s | みちへしらない',
+    default: 'しらないみちへ - Unknown Roads',
+    template: '%s | しらないみちへ',
   },
   description: 'A bilingual travel blog exploring Japanese culture and destinations',
   openGraph: {
     type: 'website',
-    siteName: 'みちへしらない (Unknown Roads)',
+    siteName: 'しらないみちへ (Unknown Roads)',
     locale: 'ja_JP',
   },
   twitter: {
