@@ -35,15 +35,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   
+  console.log('=== METADATA GENERATION START ===')
+  console.log('Slug:', slug)
+  console.log('ENV NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL)
+  console.log('ENV exists?:', !!process.env.NEXT_PUBLIC_SITE_URL)
+  
   try {
     const { post } = await apiClient.getPostBySlug(slug)
     
     if (!post) {
+      console.error('❌ Post not found:', slug)
       return {
-        title: 'Unknown Road| しらないみちへ',
+        title: 'Post Not Found | みちへしらない',
         description: 'The requested blog post could not be found.',
       }
     }
+    
+    console.log('✅ Post found:', post.id)
+    console.log('Post title:', post.title)
+    console.log('Post coverImage (raw):', post.coverImage)
+    console.log('CoverImage type:', typeof post.coverImage)
+    console.log('CoverImage is empty?:', !post.coverImage || post.coverImage.trim() === '')
     
     const { english, japanese } = parseBilingualTitle(post.title)
     
@@ -53,27 +65,32 @@ export async function generateMetadata({
       day: 'numeric'
     })} · 中野 · 東京`
     
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    // Use hardcoded URL for now to test
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://starbuckin-winter.vercel.app'
     const postUrl = `${siteUrl}/blog/${slug}`
+    
+    console.log('Site URL:', siteUrl)
     
     // Process cover image URL
     let coverImageUrl = `${siteUrl}/og-default.jpg` // Fallback default
     
     if (post.coverImage && post.coverImage.trim()) {
       const img = post.coverImage.trim()
+      console.log('Processing image:', img)
+      
       if (img.startsWith('http://') || img.startsWith('https://')) {
         coverImageUrl = img
+        console.log('✅ Using absolute URL:', coverImageUrl)
       } else {
         coverImageUrl = img.startsWith('/') ? `${siteUrl}${img}` : `${siteUrl}/${img}`
+        console.log('✅ Converted to absolute URL:', coverImageUrl)
       }
+    } else {
+      console.log('⚠️ No coverImage found, using fallback')
     }
     
-    // IMPORTANT: Log for debugging (visible in Vercel logs)
-    console.log(`[Metadata] Slug: ${slug}`)
-    console.log(`[Metadata] Title: ${english}`)
-    console.log(`[Metadata] Raw coverImage: ${post.coverImage}`)
-    console.log(`[Metadata] Processed coverImageUrl: ${coverImageUrl}`)
-    console.log(`[Metadata] Site URL: ${siteUrl}`)
+    console.log('Final coverImageUrl:', coverImageUrl)
+    console.log('=== METADATA GENERATION END ===')
     
     const description = post.excerpt || post.description || caption
     
@@ -95,7 +112,7 @@ export async function generateMetadata({
         ],
         url: postUrl,
         type: 'article',
-        siteName: 'しらないみちへ (Unknown Roads)',
+        siteName: 'みちへしらない (Unknown Roads)',
         locale: 'ja_JP',
         publishedTime: post.createdAt ? new Date(post.createdAt).toISOString() : undefined,
         modifiedTime: post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
@@ -120,7 +137,7 @@ export async function generateMetadata({
       },
     }
   } catch (error) {
-    console.error(`[Metadata] Error generating metadata for ${slug}:`, error)
+    console.error('❌ Error generating metadata:', error)
     
     const formattedSlug = slug
       .split('-')
@@ -128,14 +145,14 @@ export async function generateMetadata({
       .join(' ')
     
     return {
-      title: `${formattedSlug} | しらないみちへ`,
+      title: `${formattedSlug} | みちへしらない`,
       description: 'Travel blog exploring Japan and beyond',
       openGraph: {
         title: formattedSlug,
         description: 'Travel blog exploring Japan and beyond',
         images: [
           {
-            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-default.jpg`,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://starbuckin-winter.vercel.app'}/og-default.jpg`,
             width: 1200,
             height: 630,
           },
@@ -143,7 +160,7 @@ export async function generateMetadata({
       },
       twitter: {
         card: 'summary_large_image',
-        images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-default.jpg`],
+        images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://starbuckin-winter.vercel.app'}/og-default.jpg`],
       },
     }
   }
