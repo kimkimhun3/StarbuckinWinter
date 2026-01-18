@@ -54,18 +54,30 @@ export async function generateMetadata({
     
     // Ensure image URL is absolute for social media sharing
     const getAbsoluteImageUrl = (imageUrl: string | null | undefined): string => {
-      if (!imageUrl) {
+      if (!imageUrl || imageUrl.trim() === '') {
+        // Return a default image if no cover image provided
+        // Note: You should have a default OG image at /default-og-image.jpg
         return `${siteUrl}/default-og-image.jpg`
       }
+      
+      const trimmedUrl = imageUrl.trim()
+      
       // If already absolute URL (starts with http:// or https://), use as is
-      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return imageUrl
+      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        return trimmedUrl
       }
+      
       // Otherwise, make it absolute by prepending siteUrl
-      return imageUrl.startsWith('/') ? `${siteUrl}${imageUrl}` : `${siteUrl}/${imageUrl}`
+      return trimmedUrl.startsWith('/') ? `${siteUrl}${trimmedUrl}` : `${siteUrl}/${trimmedUrl}`
     }
     
     const coverImageUrl = getAbsoluteImageUrl(post.coverImage)
+    
+    // Validate that we have a valid image URL
+    // Social media platforms require absolute URLs that are publicly accessible
+    if (!coverImageUrl || (!coverImageUrl.startsWith('http://') && !coverImageUrl.startsWith('https://'))) {
+      console.warn(`Invalid cover image URL for post ${slug}: ${coverImageUrl}`)
+    }
     
     // Prepare the description
     const description = post.excerpt || post.description || caption
@@ -84,6 +96,7 @@ export async function generateMetadata({
             width: 1200,
             height: 630,
             alt: english,
+            type: 'image/jpeg', // Help social platforms understand the image type
           },
         ],
         url: postUrl,
@@ -99,12 +112,13 @@ export async function generateMetadata({
         authors: post.authorName || post.author?.name || 'Anonymous',
       },
       
-      // Twitter Card metadata
+      // Twitter Card metadata (X/Twitter uses different format)
       twitter: {
         card: 'summary_large_image',
         title: english,
         description: caption,
-        images: [coverImageUrl],
+        images: [coverImageUrl], // Twitter images can be string array or object
+        creator: '@your_twitter_handle', // Optional: Add your Twitter handle
       },
       
       // Additional metadata
