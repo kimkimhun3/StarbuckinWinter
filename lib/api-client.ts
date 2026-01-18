@@ -9,7 +9,7 @@ export class ApiClient {
       this.baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     } else {
       // CLIENT-SIDE: Use relative URLs (works in browser)
-      this.baseUrl = ''
+      this.baseUrl = 'http://localhost:3000'
     }
     this.token = null
   }

@@ -86,12 +86,58 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate slug from title
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
-      + '-' + Date.now()
+    // Helper function to parse bilingual title and get English part
+    function parseBilingualTitle(title: string): string {
+      const delimiters = ['|', '/', ' - ']
+      
+      for (const delimiter of delimiters) {
+        if (title.includes(delimiter)) {
+          const parts = title.split(delimiter).map(part => part.trim())
+          if (parts.length >= 2) {
+            return parts[0] // Return English part (first part)
+          }
+        }
+      }
+      
+      return title // If no delimiter found, return whole title
+    }
+
+    // Generate slug from English title only
+    function generateSlugFromTitle(titleText: string): string {
+      return titleText
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters, keep letters, numbers, spaces, and hyphens
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/(^-|-$)/g, '') // Remove leading/trailing hyphens
+        .trim()
+    }
+
+    const englishTitle = parseBilingualTitle(title)
+    let baseSlug = generateSlugFromTitle(englishTitle)
+    
+    // Check for uniqueness and handle collisions
+    let slug = baseSlug
+    let counter = 0
+    let isUnique = false
+    
+    while (!isUnique) {
+      const existingPost = await prisma.post.findUnique({
+        where: { slug }
+      })
+      
+      if (!existingPost) {
+        isUnique = true
+      } else {
+        counter++
+        slug = `${baseSlug}-${counter}`
+      }
+      
+      // Safety check to prevent infinite loop
+      if (counter > 1000) {
+        throw new Error('Unable to generate unique slug')
+      }
+    }
 
     // Create post
     const post = await prisma.post.create({

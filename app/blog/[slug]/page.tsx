@@ -383,12 +383,30 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
     try {
       apiClient.setToken(token)
-      await apiClient.createComment(post.id, commentContent)
+      const response = await apiClient.createComment(post.id, commentContent)
+      
+      // If admin, the comment is auto-approved and we can add it directly
+      // Otherwise, we need to refresh comments to see if it appears
+      // But to avoid image reloading, we'll only update comments if user is admin
+      if (user.role === 'ADMIN' && response.comment) {
+        // Add the new comment to the post comments array without reloading everything
+        setPost((prevPost: any) => ({
+          ...prevPost,
+          comments: [response.comment, ...(prevPost?.comments || [])]
+        }))
+      } else {
+        // For non-admin users, just fetch updated comments without reloading the whole post
+        const { comments } = await apiClient.getComments(post.id)
+        setPost((prevPost: any) => ({
+          ...prevPost,
+          comments: comments || []
+        }))
+      }
+      
       setCommentContent('')
       setCommentSuccess(true)
       
       setTimeout(() => {
-        loadPost()
         setCommentSuccess(false)
       }, 2000)
     } catch (error) {

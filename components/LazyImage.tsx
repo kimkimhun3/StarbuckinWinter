@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
+
+// Global cache to track loaded images across component re-renders
+const loadedImagesCache = new Set<string>()
 
 interface LazyImageProps {
   src: string
@@ -11,7 +14,7 @@ interface LazyImageProps {
   style?: React.CSSProperties
 }
 
-export default function LazyImage({ 
+function LazyImageComponent({ 
   src, 
   alt, 
   width, 
@@ -19,12 +22,27 @@ export default function LazyImage({
   className = '', 
   style 
 }: LazyImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isInView, setIsInView] = useState(false)
+  // Use cache to determine initial loaded state
+  const wasPreviouslyLoaded = loadedImagesCache.has(src)
+  const [isLoaded, setIsLoaded] = useState(wasPreviouslyLoaded)
+  const [isInView, setIsInView] = useState(wasPreviouslyLoaded) // If already loaded, show immediately
   const [hasError, setHasError] = useState(false)
   const imgRef = useRef<HTMLDivElement>(null)
+  const imageElementRef = useRef<HTMLImageElement | null>(null)
+
+  // Mark image as loaded in cache when it loads
+  useEffect(() => {
+    if (wasPreviouslyLoaded && !isInView) {
+      setIsInView(true)
+    }
+  }, [wasPreviouslyLoaded, isInView])
 
   useEffect(() => {
+    // If already cached, don't need observer
+    if (loadedImagesCache.has(src)) {
+      return
+    }
+
     // Intersection Observer to detect when image enters viewport
     const observer = new IntersectionObserver(
       (entries) => {
@@ -46,7 +64,7 @@ export default function LazyImage({
     }
 
     return () => observer.disconnect()
-  }, [])
+  }, [src])
 
   // Determine if image has custom size (should be centered)
   const hasCustomSize = width || height
@@ -133,7 +151,18 @@ export default function LazyImage({
             margin: hasCustomSize ? '0 auto' : undefined,
             ...style
           }}
-          onLoad={() => setIsLoaded(true)}
+          ref={(el) => {
+            imageElementRef.current = el
+            // Check if image is already loaded (cached in browser)
+            if (el && el.complete && el.naturalHeight !== 0 && !isLoaded) {
+              setIsLoaded(true)
+              loadedImagesCache.add(src)
+            }
+          }}
+          onLoad={() => {
+            setIsLoaded(true)
+            loadedImagesCache.add(src) // Cache loaded images
+          }}
           onError={() => {
             setHasError(true)
             console.error(`Failed to load image: ${src}`)
@@ -143,3 +172,21 @@ export default function LazyImage({
     </div>
   )
 }
+
+// Memoize component to prevent unnecessary re-renders when parent re-renders
+// Only re-render if props actually change
+const LazyImage = memo(LazyImageComponent, (prevProps, nextProps) => {
+  // Only re-render if src, alt, width, or height changes
+  return (
+    prevProps.src === nextProps.src &&
+    prevProps.alt === nextProps.alt &&
+    prevProps.width === nextProps.width &&
+    prevProps.height === nextProps.height &&
+    prevProps.className === nextProps.className &&
+    JSON.stringify(prevProps.style) === JSON.stringify(nextProps.style)
+  )
+})
+
+LazyImage.displayName = 'LazyImage'
+
+export default LazyImage

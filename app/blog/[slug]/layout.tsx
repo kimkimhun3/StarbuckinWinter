@@ -52,6 +52,21 @@ export async function generateMetadata({
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     const postUrl = `${siteUrl}/blog/${slug}`
     
+    // Ensure image URL is absolute for social media sharing
+    const getAbsoluteImageUrl = (imageUrl: string | null | undefined): string => {
+      if (!imageUrl) {
+        return `${siteUrl}/default-og-image.jpg`
+      }
+      // If already absolute URL (starts with http:// or https://), use as is
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl
+      }
+      // Otherwise, make it absolute by prepending siteUrl
+      return imageUrl.startsWith('/') ? `${siteUrl}${imageUrl}` : `${siteUrl}/${imageUrl}`
+    }
+    
+    const coverImageUrl = getAbsoluteImageUrl(post.coverImage)
+    
     // Prepare the description
     const description = post.excerpt || post.description || caption
     
@@ -65,7 +80,7 @@ export async function generateMetadata({
         description: caption, // Using caption for social preview
         images: [
           {
-            url: post.coverImage || `${siteUrl}/default-og-image.jpg`,
+            url: coverImageUrl,
             width: 1200,
             height: 630,
             alt: english,
@@ -89,7 +104,7 @@ export async function generateMetadata({
         card: 'summary_large_image',
         title: english,
         description: caption,
-        images: [post.coverImage || `${siteUrl}/default-og-image.jpg`],
+        images: [coverImageUrl],
       },
       
       // Additional metadata
