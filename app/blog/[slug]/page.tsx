@@ -35,27 +35,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   
-  console.log('=== METADATA GENERATION START ===')
-  console.log('Slug:', slug)
-  console.log('ENV NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL)
-  console.log('ENV exists?:', !!process.env.NEXT_PUBLIC_SITE_URL)
-  
   try {
     const { post } = await apiClient.getPostBySlug(slug)
     
     if (!post) {
-      console.error('❌ Post not found:', slug)
       return {
         title: 'Post Not Found | みちへしらない',
         description: 'The requested blog post could not be found.',
       }
     }
-    
-    console.log('✅ Post found:', post.id)
-    console.log('Post title:', post.title)
-    console.log('Post coverImage (raw):', post.coverImage)
-    console.log('CoverImage type:', typeof post.coverImage)
-    console.log('CoverImage is empty?:', !post.coverImage || post.coverImage.trim() === '')
     
     const { english, japanese } = parseBilingualTitle(post.title)
     
@@ -65,32 +53,41 @@ export async function generateMetadata({
       day: 'numeric'
     })} · 中野 · 東京`
     
-    // Use hardcoded URL for now to test
+    // Get the site URL from environment variable
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://starbuckin-winter.vercel.app'
     const postUrl = `${siteUrl}/blog/${slug}`
     
-    console.log('Site URL:', siteUrl)
-    
-    // Process cover image URL
-    let coverImageUrl = `${siteUrl}/og-default.jpg` // Fallback default
-    
-    if (post.coverImage && post.coverImage.trim()) {
-      const img = post.coverImage.trim()
-      console.log('Processing image:', img)
-      
-      if (img.startsWith('http://') || img.startsWith('https://')) {
-        coverImageUrl = img
-        console.log('✅ Using absolute URL:', coverImageUrl)
-      } else {
-        coverImageUrl = img.startsWith('/') ? `${siteUrl}${img}` : `${siteUrl}/${img}`
-        console.log('✅ Converted to absolute URL:', coverImageUrl)
+    // Ensure image URL is absolute for social media sharing
+    // Post coverImage is stored as a string URL in the database (e.g., https://countrysidestays-japan.com/img/article/shobara/story_mv.jpg)
+    const getAbsoluteImageUrl = (imageUrl: string | null | undefined): string => {
+      // Check if coverImage exists and is not empty
+      if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+        // Return default image if no cover image provided
+        return `${siteUrl}/og-default.jpg`
       }
-    } else {
-      console.log('⚠️ No coverImage found, using fallback')
+      
+      const trimmedUrl = imageUrl.trim()
+      
+      // If already absolute URL (starts with http:// or https://), use as is
+      // This is the most common case - user pastes full URL like https://countrysidestays-japan.com/img/article/shobara/story_mv.jpg
+      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+        return trimmedUrl
+      }
+      
+      // Otherwise, make it absolute by prepending siteUrl
+      // Handles relative paths like /images/photo.jpg
+      return trimmedUrl.startsWith('/') ? `${siteUrl}${trimmedUrl}` : `${siteUrl}/${trimmedUrl}`
     }
     
-    console.log('Final coverImageUrl:', coverImageUrl)
-    console.log('=== METADATA GENERATION END ===')
+    // Get cover image URL from post - this comes directly from database
+    const coverImageUrl = getAbsoluteImageUrl(post.coverImage)
+    
+    // Debug logging (can be removed in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Metadata] Post ${slug}:`)
+      console.log(`  - coverImage from DB:`, post.coverImage)
+      console.log(`  - Final coverImageUrl:`, coverImageUrl)
+    }
     
     const description = post.excerpt || post.description || caption
     

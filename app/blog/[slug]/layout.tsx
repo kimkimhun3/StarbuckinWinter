@@ -53,30 +53,35 @@ export async function generateMetadata({
     const postUrl = `${siteUrl}/blog/${slug}`
     
     // Ensure image URL is absolute for social media sharing
+    // Post coverImage is stored as a string URL in the database
     const getAbsoluteImageUrl = (imageUrl: string | null | undefined): string => {
-      if (!imageUrl || imageUrl.trim() === '') {
-        // Return a default image if no cover image provided
-        // Note: You should have a default OG image at /default-og-image.jpg
-        return `${siteUrl}/default-og-image.jpg`
+      // Check if coverImage exists and is not empty
+      if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+        // Return default image if no cover image provided
+        return `${siteUrl}/og-default.jpg`
       }
       
       const trimmedUrl = imageUrl.trim()
       
       // If already absolute URL (starts with http:// or https://), use as is
+      // This is the most common case - user pastes full URL like https://countrysidestays-japan.com/img/article/shobara/story_mv.jpg
       if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
         return trimmedUrl
       }
       
       // Otherwise, make it absolute by prepending siteUrl
+      // Handles relative paths like /images/photo.jpg
       return trimmedUrl.startsWith('/') ? `${siteUrl}${trimmedUrl}` : `${siteUrl}/${trimmedUrl}`
     }
     
+    // Get cover image URL from post - this comes directly from database
     const coverImageUrl = getAbsoluteImageUrl(post.coverImage)
     
-    // Validate that we have a valid image URL
-    // Social media platforms require absolute URLs that are publicly accessible
-    if (!coverImageUrl || (!coverImageUrl.startsWith('http://') && !coverImageUrl.startsWith('https://'))) {
-      console.warn(`Invalid cover image URL for post ${slug}: ${coverImageUrl}`)
+    // Log for debugging (can be removed in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Metadata] Post ${slug}:`)
+      console.log(`  - coverImage from DB:`, post.coverImage)
+      console.log(`  - Final coverImageUrl:`, coverImageUrl)
     }
     
     // Prepare the description
