@@ -87,7 +87,9 @@ export default function HousesSection() {
                     さいしんのたび
                   </div>
                   {/* Horizontal Bar - matches text height */}
-                  <div className="w-[1.5px] sm:w-[2px] md:w-[2.25px] lg:w-[2.5px] xl:w-[3px] bg-[#3D3D3D] self-stretch mt-1.5 sm:mt-2"></div>
+                  {/* <div className="w-[1px] sm:w-[1px] md:w-[.25px] lg:w-[2.5px] xl:w-[3px] bg-[#3D3D3D] self-stretch mt-1.5 sm:mt-2"></div> */}
+                  <div className="w-[1px] bg-[#3D3D3D] self-stretch mt-2"></div>
+
                 </div>
               </Reveal>
 
