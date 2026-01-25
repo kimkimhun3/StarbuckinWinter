@@ -58,22 +58,31 @@ export async function generateMetadata({
     const postUrl = `${siteUrl}/blog/${slug}`
     
     // Ensure image URL is absolute for social media sharing
+    // Post coverImage is stored as a string URL in the database (e.g., https://countrysidestays-japan.com/img/article/shobara/story_mv.jpg)
     const getAbsoluteImageUrl = (imageUrl: string | null | undefined): string => {
+      // Check if coverImage exists and is not empty
       if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+        // Return default image if no cover image provided
         return `${siteUrl}/og-default.jpg`
       }
       
       const trimmedUrl = imageUrl.trim()
       
+      // If already absolute URL (starts with http:// or https://), use as is
+      // This is the most common case - user pastes full URL like https://countrysidestays-japan.com/img/article/shobara/story_mv.jpg
       if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
         return trimmedUrl
       }
       
+      // Otherwise, make it absolute by prepending siteUrl
+      // Handles relative paths like /images/photo.jpg
       return trimmedUrl.startsWith('/') ? `${siteUrl}${trimmedUrl}` : `${siteUrl}/${trimmedUrl}`
     }
     
+    // Get cover image URL from post - this comes directly from database
     const coverImageUrl = getAbsoluteImageUrl(post.coverImage)
     
+    // Debug logging (can be removed in production)
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Metadata] Post ${slug}:`)
       console.log(`  - coverImage from DB:`, post.coverImage)
@@ -154,7 +163,7 @@ export async function generateMetadata({
   }
 }
 
-// ✅ NEW: Server Component that FETCHES DATA and passes to client
+// Server Component that renders the Client Component
 export default async function BlogPostPage({
   params,
 }: {
@@ -162,18 +171,6 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params
   
-  try {
-    // ✅ Fetch post data on server (only once!)
-    const { post } = await apiClient.getPostBySlug(slug)
-    
-    if (!post) {
-      notFound()
-    }
-    
-    // ✅ Pass initial data to client component - NO DOUBLE FETCH!
-    return <BlogPostClient slug={slug} initialPost={post} />
-  } catch (error) {
-    console.error('❌ Error loading post:', error)
-    notFound()
-  }
+  // Pass the slug to the client component
+  return <BlogPostClient slug={slug} />
 }

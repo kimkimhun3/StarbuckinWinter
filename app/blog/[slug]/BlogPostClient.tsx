@@ -35,6 +35,11 @@ async function translateToJapanese(text: string, mode: 'content' = 'content'): P
 // Helper function to parse bilingual title
 // Format: "English Title | 日本語タイトル"
 function parseBilingualTitle(title: string): { english: string; japanese: string } {
+  // Support multiple delimiter formats:
+  // "English Title | 日本語タイトル"
+  // "English Title / 日本語タイトル"
+  // "English Title - 日本語タイトル"
+  
   const delimiters = ['|', '/', ' - ']
   
   for (const delimiter of delimiters) {
@@ -49,6 +54,7 @@ function parseBilingualTitle(title: string): { english: string; japanese: string
     }
   }
   
+  // If no delimiter found, return the whole title for both (fallback)
   return {
     english: title,
     japanese: title
@@ -170,17 +176,11 @@ function BilingualTitle({
   )
 }
 
-// ✅ NEW: Add initialPost prop type
-interface BlogPostClientProps {
-  slug: string
-  initialPost?: any // TODO: Replace with your actual Post type
-}
-
-export default function BlogPostClient({ slug, initialPost }: BlogPostClientProps) {
+export default function BlogPostClient({ slug }: { slug: string }) {
   const { user, token } = useAuth()
-  const [post, setPost] = useState<any>(initialPost || null) // ✅ Use initialPost if available
+  const [post, setPost] = useState<any>(null)
   const [relatedPosts, setRelatedPosts] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(!initialPost) // ✅ Not loading if we have initialPost
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [commentContent, setCommentContent] = useState('')
   const [isSubmittingComment, setIsSubmittingComment] = useState(false)
@@ -222,74 +222,9 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
     }
   }, [])
 
-  // ✅ UPDATED: Only fetch if we don't have initialPost
   useEffect(() => {
-    if (initialPost) {
-      // We already have the post data from server!
-      setPost(initialPost)
-      setLoveCount(initialPost.loveCount || 0)
-      setViewCount(initialPost.viewCount || 0)
-      setIsLoading(false)
-      
-      // Parse bilingual title
-      const { english, japanese } = parseBilingualTitle(initialPost.title)
-      setEnglishTitle(english)
-      setJapaneseTitle(japanese)
-      
-      // Reset translated content
-      setTranslatedContent('')
-      setHeadingIdMap(new Map())
-      
-      // ✅ Increment view count (async, don't wait)
-      incrementViewCount(initialPost.id)
-      
-      // ✅ Load related posts (async, don't wait)
-      loadRelatedPosts(initialPost.id)
-    } else {
-      // Fallback: fetch if initialPost not provided
-      loadPost()
-    }
-  }, [slug, initialPost])
-
-  // ✅ NEW: Separate function to increment view count
-  const incrementViewCount = async (postId: string) => {
-    try {
-      await apiClient.incrementViewCount(postId)
-      setViewCount((prev) => prev + 1)
-    } catch (err) {
-      console.error('Failed to increment view count:', err)
-    }
-  }
-
-  // ✅ UPDATED: Simplified loadPost (only used as fallback)
-  const loadPost = async () => {
-    try {
-      const { post } = await apiClient.getPostBySlug(slug)
-      setPost(post)
-      setLoveCount(post.loveCount || 0)
-      setViewCount(post.viewCount || 0)
-      
-      // Reset translated content when loading new post
-      setTranslatedContent('')
-      setHeadingIdMap(new Map())
-      
-      // Parse bilingual title
-      const { english, japanese } = parseBilingualTitle(post.title)
-      setEnglishTitle(english)
-      setJapaneseTitle(japanese)
-      
-      // Increment view count
-      incrementViewCount(post.id)
-      
-      // Load related posts
-      await loadRelatedPosts(post.id)
-    } catch (error) {
-      setError('Post not found')
-      console.error('Failed to load post:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    loadPost()
+  }, [slug])
 
   // Auto-translate when post loads if user preference is Japanese
   useEffect(() => {
@@ -320,6 +255,40 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
 
     autoTranslate()
   }, [post, currentLanguage])
+
+  const loadPost = async () => {
+    try {
+      const { post } = await apiClient.getPostBySlug(slug)
+      setPost(post)
+      setLoveCount(post.loveCount || 0)
+      setViewCount(post.viewCount || 0)
+      
+      // Reset translated content when loading new post
+      setTranslatedContent('')
+      setHeadingIdMap(new Map())
+      
+      // Parse bilingual title - INSTANT! No API call needed
+      const { english, japanese } = parseBilingualTitle(post.title)
+      setEnglishTitle(english)
+      setJapaneseTitle(japanese)
+      
+      // Increment view count when post loads
+      try {
+        await apiClient.incrementViewCount(post.id)
+        setViewCount((prev) => prev + 1)
+      } catch (err) {
+        console.error('Failed to increment view count:', err)
+      }
+      
+      // Load related posts after getting the current post
+      await loadRelatedPosts(post.id)
+    } catch (error) {
+      setError('Post not found')
+      console.error('Failed to load post:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleLoveClick = async () => {
     if (!post || hasLoved || isLoving) return
