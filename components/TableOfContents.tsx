@@ -11,17 +11,11 @@ interface TocItem {
 interface TableOfContentsProps {
   content: string
   headingIdMap?: Map<string, string> // Map of Japanese heading text to English ID
-  onHeadingClick?: (id: string) => Promise<void> // ✅ NEW: Callback when heading clicked
 }
 
-export default function TableOfContents({ 
-  content, 
-  headingIdMap,
-  onHeadingClick // ✅ NEW
-}: TableOfContentsProps) {
+export default function TableOfContents({ content, headingIdMap }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState<string>('')
-  const [isNavigating, setIsNavigating] = useState(false) // ✅ NEW: Loading state
 
   useEffect(() => {
     // Extract headings from markdown content
@@ -129,49 +123,25 @@ export default function TableOfContents({
     }
   }, [headings])
 
-  // ✅ NEW: Enhanced click handler with loading support
-  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
     
-    setIsNavigating(true)
+    const element = document.getElementById(id)
     
-    try {
-      // Check if element exists
-      let element = document.getElementById(id)
-      
-      if (!element) {
-        // Element doesn't exist - trigger callback to load content
-        if (onHeadingClick) {
-          console.log(`🔄 Loading content for: ${id}`)
-          await onHeadingClick(id)
-          
-          // Wait a bit for React to render
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
-          // Try to find element again
-          element = document.getElementById(id)
-        }
-      }
-      
-      if (element) {
-        const offset = 100 // Offset from top
-        const elementPosition = element.getBoundingClientRect().top
-        const offsetPosition = elementPosition + window.pageYOffset - offset
+    if (element) {
+      const offset = 100 // Offset from top
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - offset
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth',
-        })
-        
-        // Update active ID immediately on click
-        setActiveId(id)
-      } else {
-        console.warn(`⚠️ Could not find element: ${id}`)
-      }
-    } finally {
-      setIsNavigating(false)
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      })
+      
+      // Update active ID immediately on click
+      setActiveId(id)
     }
-  }
+}
 
   if (headings.length === 0) {
     return null
@@ -184,13 +154,6 @@ export default function TableOfContents({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
         </svg>
         Table of Contents
-        {/* ✅ NEW: Show loading indicator */}
-        {isNavigating && (
-          <svg className="animate-spin ml-2 h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        )}
       </h2>
       
       <nav>
@@ -202,7 +165,6 @@ export default function TableOfContents({
                 paddingLeft: `${(heading.level - 1) * 16}px`,
               }}
             >
-
               <a
                 href={`#${heading.id}`}
                 onClick={(e) => handleClick(e, heading.id)}
@@ -210,8 +172,7 @@ export default function TableOfContents({
                   activeId === heading.id
                     ? 'text-indigo-600 font-semibold'
                     : 'text-gray-600'
-                } ${isNavigating ? 'pointer-events-none opacity-50' : ''}`} 
-
+                }`}
               >
                 {heading.text}
               </a>
