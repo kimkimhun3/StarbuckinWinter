@@ -176,20 +176,24 @@ function BilingualTitle({
   )
 }
 
-export default function BlogPostClient({ slug }: { slug: string }) {
+export default function BlogPostClient({ slug, initialPost }: { slug: string; initialPost?: any }) {
   const { user, token } = useAuth()
-  const [post, setPost] = useState<any>(null)
+  const [post, setPost] = useState<any>(initialPost ?? null)
   const [relatedPosts, setRelatedPosts] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(!initialPost)
   const [error, setError] = useState('')
   const [commentContent, setCommentContent] = useState('')
   const [isSubmittingComment, setIsSubmittingComment] = useState(false)
   const [commentSuccess, setCommentSuccess] = useState(false)
   const [fontsLoaded, setFontsLoaded] = useState(false)
   
-  // Parsed title state
-  const [englishTitle, setEnglishTitle] = useState('')
-  const [japaneseTitle, setJapaneseTitle] = useState('')
+  // Parsed title state (derive from initialPost when present so first paint is correct)
+  const [englishTitle, setEnglishTitle] = useState(() =>
+    initialPost ? parseBilingualTitle(initialPost.title).english : ''
+  )
+  const [japaneseTitle, setJapaneseTitle] = useState(() =>
+    initialPost ? parseBilingualTitle(initialPost.title).japanese : ''
+  )
   
   // Language switching state
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'ja'>('en')
@@ -223,8 +227,26 @@ export default function BlogPostClient({ slug }: { slug: string }) {
   }, [])
 
   useEffect(() => {
-    loadPost()
-  }, [slug])
+    if (initialPost) {
+      setPost(initialPost)
+      setLoveCount(initialPost.loveCount ?? 0)
+      setViewCount(initialPost.viewCount ?? 0)
+      setTranslatedContent('')
+      setHeadingIdMap(new Map())
+      const { english, japanese } = parseBilingualTitle(initialPost.title)
+      setEnglishTitle(english)
+      setJapaneseTitle(japanese)
+      setError('')
+      setIsLoading(false)
+      apiClient.incrementViewCount(initialPost.id).then(
+        () => setViewCount((c) => c + 1),
+        (err) => console.error('Failed to increment view count:', err)
+      )
+      loadRelatedPosts(initialPost.id)
+    } else {
+      loadPost()
+    }
+  }, [slug, initialPost])
 
   // Auto-translate when post loads if user preference is Japanese
   useEffect(() => {
@@ -262,26 +284,17 @@ export default function BlogPostClient({ slug }: { slug: string }) {
       setPost(post)
       setLoveCount(post.loveCount || 0)
       setViewCount(post.viewCount || 0)
-      
-      // Reset translated content when loading new post
       setTranslatedContent('')
       setHeadingIdMap(new Map())
-      
-      // Parse bilingual title - INSTANT! No API call needed
       const { english, japanese } = parseBilingualTitle(post.title)
       setEnglishTitle(english)
       setJapaneseTitle(japanese)
-      
-      // Increment view count when post loads
-      try {
-        await apiClient.incrementViewCount(post.id)
-        setViewCount((prev) => prev + 1)
-      } catch (err) {
-        console.error('Failed to increment view count:', err)
-      }
-      
-      // Load related posts after getting the current post
-      await loadRelatedPosts(post.id)
+      setError('')
+      apiClient.incrementViewCount(post.id).then(
+        () => setViewCount((c) => c + 1),
+        (err) => console.error('Failed to increment view count:', err)
+      )
+      loadRelatedPosts(post.id)
     } catch (error) {
       setError('Post not found')
       console.error('Failed to load post:', error)
@@ -318,14 +331,8 @@ export default function BlogPostClient({ slug }: { slug: string }) {
 
   const loadRelatedPosts = async (currentPostId: string) => {
     try {
-      const response = await apiClient.getPublicPosts()
-      const allPosts = response.posts || []
-      
-      const otherPosts = allPosts.filter((p: any) => p.id !== currentPostId)
-      const shuffled = otherPosts.sort(() => 0.5 - Math.random())
-      const randomPosts = shuffled.slice(0, 4)
-      
-      setRelatedPosts(randomPosts)
+      const { posts } = await apiClient.getRelatedPosts(currentPostId, 4)
+      setRelatedPosts(posts ?? [])
     } catch (error) {
       console.error('Failed to load related posts:', error)
     }
@@ -855,10 +862,10 @@ export default function BlogPostClient({ slug }: { slug: string }) {
                               day: 'numeric'
                             })}
                           </time>
-                          {relatedPost.comments && relatedPost.comments.length > 0 && (
+                          {((relatedPost._count?.comments ?? relatedPost.comments?.length) ?? 0) > 0 && (
                             <>
                               <span className="mx-1 sm:mx-2">•</span>
-                              <span className="truncate">{relatedPost.comments.length} comments</span>
+                              <span className="truncate">{relatedPost._count?.comments ?? relatedPost.comments?.length} comments</span>
                             </>
                           )}
                         </div>

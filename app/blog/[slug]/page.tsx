@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { apiClient } from '@/lib/api-client'
 import { notFound } from 'next/navigation'
+import { getPostBySlugCached } from '@/lib/posts-server'
 import BlogPostClient from './BlogPostClient'
 
 export const dynamic = 'force-dynamic'
@@ -27,7 +27,7 @@ function parseBilingualTitle(title: string): { english: string; japanese: string
   }
 }
 
-// Generate metadata - THIS RUNS ON THE SERVER
+// Generate metadata - uses cached server fetch (same request as page = 1 DB hit)
 export async function generateMetadata({ 
   params 
 }: { 
@@ -36,7 +36,7 @@ export async function generateMetadata({
   const { slug } = await params
   
   try {
-    const { post } = await apiClient.getPostBySlug(slug)
+    const post = await getPostBySlugCached(slug)
     
     if (!post) {
       return {
@@ -89,7 +89,7 @@ export async function generateMetadata({
       console.log(`  - Final coverImageUrl:`, coverImageUrl)
     }
     
-    const description = post.excerpt || post.description || caption
+    const description = post.excerpt || caption
     
     return {
       title: `${english} | ${japanese}`,
@@ -163,14 +163,16 @@ export async function generateMetadata({
   }
 }
 
-// Server Component that renders the Client Component
+// Server Component: fetch post once, pass as initial data (no client-side fetch for initial load)
 export default async function BlogPostPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const post = await getPostBySlugCached(slug)
   
-  // Pass the slug to the client component
-  return <BlogPostClient slug={slug} />
+  if (!post) notFound()
+  
+  return <BlogPostClient slug={slug} initialPost={post} />
 }

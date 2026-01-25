@@ -126,6 +126,11 @@ export class ApiClient {
     return this.request('/api/posts')
   }
 
+  // Get related posts (light payload, no full content)
+  async getRelatedPosts(postId: string, limit = 4) {
+    return this.request(`/api/posts/related?postId=${encodeURIComponent(postId)}&limit=${limit}`)
+  }
+
   // Create comment
   async createComment(postId: string, content: string) {
     return this.request('/api/comments', {
