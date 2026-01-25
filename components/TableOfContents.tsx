@@ -11,17 +11,33 @@ interface TocItem {
 interface TableOfContentsProps {
   content: string
   headingIdMap?: Map<string, string> // Map of Japanese heading text to English ID
-  onHeadingClick?: (id: string) => Promise<void> // ✅ NEW: Callback when heading clicked
+  onHeadingClick?: (id: string) => Promise<void>
 }
 
 export default function TableOfContents({ 
   content, 
   headingIdMap,
-  onHeadingClick // ✅ NEW
+  onHeadingClick 
 }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState<string>('')
-  const [isNavigating, setIsNavigating] = useState(false) // ✅ NEW: Loading state
+  const [isNavigating, setIsNavigating] = useState(false)
+  
+  // ✅ NEW: Collapse state for mobile
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // ✅ NEW: Check if screen is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1280) // xl breakpoint
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     // Extract headings from markdown content
@@ -129,7 +145,7 @@ export default function TableOfContents({
     }
   }, [headings])
 
-  // ✅ NEW: Enhanced click handler with loading support
+  // Enhanced click handler with loading support
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
     
@@ -177,25 +193,54 @@ export default function TableOfContents({
     return null
   }
 
+  // ✅ NEW: Determine how many items to show when collapsed
+  const COLLAPSED_LIMIT = 5 // Show only first 5 items on mobile when collapsed
+  const displayedHeadings = isMobile && !isExpanded 
+    ? headings.slice(0, COLLAPSED_LIMIT) 
+    : headings
+  const hasMore = headings.length > COLLAPSED_LIMIT
+
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 sticky top-8">
-      <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-        <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-        Table of Contents
-        {/* ✅ NEW: Show loading indicator */}
-        {isNavigating && (
-          <svg className="animate-spin ml-2 h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 xl:sticky xl:top-8">
+      {/* ✅ UPDATED: Header with expand/collapse button on mobile */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-gray-900 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
           </svg>
+          Table of Contents
+          {/* Loading indicator */}
+          {isNavigating && (
+            <svg className="animate-spin ml-2 h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          )}
+        </h2>
+        
+        {/* ✅ NEW: Expand/Collapse button - only show on mobile when there are more items */}
+        {isMobile && hasMore && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="xl:hidden flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+            aria-label={isExpanded ? 'Show less' : 'Show more'}
+          >
+            <span>{isExpanded ? 'Less' : 'More'}</span>
+            <svg 
+              className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
         )}
-      </h2>
+      </div>
       
       <nav>
         <ul className="space-y-2">
-          {headings.map((heading) => (
+          {displayedHeadings.map((heading) => (
             <li
               key={heading.id}
               style={{
@@ -210,15 +255,29 @@ export default function TableOfContents({
                   activeId === heading.id
                     ? 'text-indigo-600 font-semibold'
                     : 'text-gray-600'
-                } ${isNavigating ? 'pointer-events-none opacity-50' : ''}`} 
-
+                } ${isNavigating ? 'pointer-events-none opacity-50' : ''}`}
               >
                 {heading.text}
               </a>
             </li>
           ))}
         </ul>
+        
+        {/* ✅ NEW: "Show More" text indicator on mobile */}
+        {isMobile && !isExpanded && hasMore && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="w-full text-center text-xs text-gray-500 hover:text-indigo-600 transition-colors flex items-center justify-center gap-1"
+            >
+              <span>+ {headings.length - COLLAPSED_LIMIT} more section{headings.length - COLLAPSED_LIMIT !== 1 ? 's' : ''}</span>
+            </button>
+          </div>
+        )}
       </nav>
     </div>
   )
-}
+  
+  
+
+  }
