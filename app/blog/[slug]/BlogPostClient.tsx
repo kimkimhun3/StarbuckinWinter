@@ -5,7 +5,6 @@ import { useAuth } from '@/lib/auth-context'
 import { apiClient } from '@/lib/api-client'
 import PublicNav from '@/components/PublicNav'
 import ProgressiveContent from '@/components/ProgressiveContent'
-import type { ProgressiveContentHandle } from '@/components/ProgressiveContent'
 import TableOfContents from '@/components/TableOfContents'
 import Link from 'next/link'
 import ShareButton from '@/components/Hero/ShareButton'
@@ -177,12 +176,7 @@ function BilingualTitle({
   )
 }
 
-interface BlogPostClientProps {
-  slug: string
-  initialPost?: any
-}
-
-export default function BlogPostClient({ slug, initialPost }: BlogPostClientProps) {
+export default function BlogPostClient({ slug, initialPost }: { slug: string; initialPost?: any }) {
   const { user, token } = useAuth()
   const [post, setPost] = useState<any>(initialPost ?? null)
   const [relatedPosts, setRelatedPosts] = useState<any[]>([])
@@ -193,9 +187,13 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
   const [commentSuccess, setCommentSuccess] = useState(false)
   const [fontsLoaded, setFontsLoaded] = useState(false)
   
-  // Parsed title state
-  const [englishTitle, setEnglishTitle] = useState('')
-  const [japaneseTitle, setJapaneseTitle] = useState('')
+  // Parsed title state (derive from initialPost when present so first paint is correct)
+  const [englishTitle, setEnglishTitle] = useState(() =>
+    initialPost ? parseBilingualTitle(initialPost.title).english : ''
+  )
+  const [japaneseTitle, setJapaneseTitle] = useState(() =>
+    initialPost ? parseBilingualTitle(initialPost.title).japanese : ''
+  )
   
   // Language switching state
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'ja'>('en')
@@ -208,9 +206,6 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
   const [viewCount, setViewCount] = useState(0)
   const [isLoving, setIsLoving] = useState(false)
   const [hasLoved, setHasLoved] = useState(false)
-
-  // ✅ NEW: Ref to access ProgressiveContent methods
-  const progressiveContentRef = useRef<ProgressiveContentHandle>(null)
 
   // Load language preference from localStorage on mount
   useEffect(() => {
@@ -289,26 +284,17 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
       setPost(post)
       setLoveCount(post.loveCount || 0)
       setViewCount(post.viewCount || 0)
-      
-      // Reset translated content when loading new post
       setTranslatedContent('')
       setHeadingIdMap(new Map())
-      
-      // Parse bilingual title
       const { english, japanese } = parseBilingualTitle(post.title)
       setEnglishTitle(english)
       setJapaneseTitle(japanese)
-      
-      // Increment view count
-      try {
-        await apiClient.incrementViewCount(post.id)
-        setViewCount((prev) => prev + 1)
-      } catch (err) {
-        console.error('Failed to increment view count:', err)
-      }
-      
-      // Load related posts
-      await loadRelatedPosts(post.id)
+      setError('')
+      apiClient.incrementViewCount(post.id).then(
+        () => setViewCount((c) => c + 1),
+        (err) => console.error('Failed to increment view count:', err)
+      )
+      loadRelatedPosts(post.id)
     } catch (error) {
       setError('Post not found')
       console.error('Failed to load post:', error)
@@ -383,14 +369,6 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
       setCurrentLanguage('en')
       // Save language preference
       localStorage.setItem('preferredLanguage', 'en')
-    }
-  }
-
-  // ✅ NEW: Handler for TOC clicks - loads all content before scrolling
-  const handleTOCHeadingClick = async (targetId: string) => {
-    // Force load all content so the target heading exists in DOM
-    if (progressiveContentRef.current) {
-      progressiveContentRef.current.loadAllContent()
     }
   }
 
@@ -655,7 +633,6 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                   key={currentLanguage} 
                   content={displayContent}
                   headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
-                  onHeadingClick={handleTOCHeadingClick}
                 />
               </aside>
 
@@ -667,7 +644,6 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                     key={currentLanguage} 
                     content={displayContent}
                     headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
-                    onHeadingClick={handleTOCHeadingClick}
                   />
                 </div>
 
@@ -686,11 +662,10 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                   /* Post Body - WITH PROGRESSIVE LOADING & LAZY IMAGES */
                   <div className="prose-content">
                     <ProgressiveContent
-                      ref={progressiveContentRef}
                       key={currentLanguage}
                       content={displayContent}
                       headingIdMap={currentLanguage === 'ja' ? headingIdMap : undefined}
-                      chunkSize={200}
+                      chunkSize={200} // Load 200 words at a time
                     />
                   </div>
                 )}
