@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AnimatedVerticalTitle from '@/components/UI/Animatedverticaltitle';
-
+import Link from 'next/link';
 type RevealProps = {
   children: React.ReactNode;
   delay?: number;
@@ -289,6 +289,17 @@ export default function AboutMeSection() {
             <p>
               Thanks for stopping by, and I hope you enjoy reading about my journey through unknown roads.
             </p>
+          </div>
+        </Reveal>
+        {/* Back to Home Link */}
+        <Reveal delay={200}>
+          <div className="flex justify-center mt-12 sm:mt-14 md:mt-16">
+            <Link 
+              href="/"
+              className="text-sm sm:text-base text-[#3D3D3D] hover:text-[#5D5D5D] transition-colors inline-flex items-center gap-2 border-b border-[#3D3D3D] hover:border-[#5D5D5D] pb-1"
+            >
+              ← ホームに戻る
+            </Link>
           </div>
         </Reveal>
       </div>

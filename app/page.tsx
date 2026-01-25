@@ -20,7 +20,7 @@ export default function HomePage() {
       <IntroSection />
       <HousesSection />
       <ProfilesSection />
-      <LandscapeSection />
+      {/* <LandscapeSection /> */}
       <MagazineSection />
       <SchoolSection />
       <Footer />

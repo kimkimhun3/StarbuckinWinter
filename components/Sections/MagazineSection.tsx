@@ -43,7 +43,7 @@ export default function MagazineSection() {
   };
 
   return (
-    <section className="bg-white py-16 px-6">
+    <section className="bg-white py-16 px-6" id='kamo'>
       <div className="max-w-6xl mx-auto">
         {/* Section Title */}
         <div className="mb-12 text-center">
@@ -86,10 +86,10 @@ export default function MagazineSection() {
         {/* Shop Link */}
         <div className="text-center">
           <Link
-            href="#"
+            href="/all"
             className="inline-block bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition-colors"
           >
-            開宅舎商店へ
+            みちのかけらをもっと見る
           </Link>
         </div>
       </div>

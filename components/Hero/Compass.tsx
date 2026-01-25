@@ -9,7 +9,7 @@ export default function Compass() {
         className="text-sm md:text-base lg:text-base font-medium text-[#3D3D3D] tracking-[0.3em]"
         style={{ writingMode: 'vertical-rl' }}
       >
-        開宅舎
+        ここではないどこか
       </div>
     </div>
   );

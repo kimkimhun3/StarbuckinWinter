@@ -9,16 +9,19 @@ export default function Navigation() {
       {/* Main navigation links */}
       <div className="space-y-4 md:space-y-5 text-[17px] md:text-[18px] lg:text-[19px] font-bold text-[#5D5D5D]">
         <Link href="#about" className="block hover:text-[#3D3D3D] transition-colors duration-300">
-          ＞ つづきをつくる
+          ＞ そのさきへ
         </Link>
         <Link href="#sawada" className="block hover:text-[#3D3D3D] transition-colors duration-300">
-          ＞ 暮らしのつづき
+          ＞ まだみえない
         </Link>
         <Link href="#kamo" className="block hover:text-[#3D3D3D] transition-colors duration-300">
-          ＞ 風景のつづき
+          ＞ なにもきめずに
         </Link>
         <Link href="#house" className="block hover:text-[#3D3D3D] transition-colors duration-300">
-          ＞ 空き家のつづき
+          ＞ ゆっくりでいい
+        </Link>
+        <Link href="/all" className="block hover:text-[#3D3D3D] transition-colors duration-300">
+          ＞ ここにのこるもの
         </Link>
       </div>
       

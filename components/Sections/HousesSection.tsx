@@ -46,6 +46,24 @@ function Reveal({ children, delay = 0 }: RevealProps) {
   );
 }
 
+// ✅ NEW: Helper function to extract English part from bilingual title
+function getEnglishTitle(title: string): string {
+  const delimiters = ['|', '/', ' - '];
+  
+  for (const delimiter of delimiters) {
+    if (title.includes(delimiter)) {
+      const parts = title.split(delimiter).map(part => part.trim());
+      if (parts.length >= 2) {
+        // Return the first part (English)
+        return parts[0];
+      }
+    }
+  }
+  
+  // If no delimiter found, return the whole title
+  return title;
+}
+
 export default function HousesSection() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,9 +105,7 @@ export default function HousesSection() {
                     さいしんのたび
                   </div>
                   {/* Horizontal Bar - matches text height */}
-                  {/* <div className="w-[1px] sm:w-[1px] md:w-[.25px] lg:w-[2.5px] xl:w-[3px] bg-[#3D3D3D] self-stretch mt-1.5 sm:mt-2"></div> */}
                   <div className="w-[1px] bg-[#3D3D3D] self-stretch mt-2"></div>
-
                 </div>
               </Reveal>
 
@@ -115,7 +131,7 @@ export default function HousesSection() {
                           <div className="w-32 xs:w-36 sm:w-44 md:w-52 lg:w-60 xl:w-72 2xl:w-80 aspect-[4/3] overflow-hidden rounded-md shadow-sm">
                             <img
                               src={post.coverImage || defaultImage}
-                              alt={post.title}
+                              alt={getEnglishTitle(post.title)}
                               className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                             />
                           </div>
@@ -123,8 +139,9 @@ export default function HousesSection() {
                         
                         {/* Text Content - All on the right */}
                         <div className="flex-1 space-y-1.5 xs:space-y-2 sm:space-y-2 md:space-y-2.5 lg:space-y-3 xl:space-y-3.5 pt-0.5 xs:pt-0.5 sm:pt-1">
+                          {/* ✅ UPDATED: Show only English title */}
                           <h3 className="text-[10px] xs:text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-[17px] font-medium text-[#3D3D3D] leading-snug line-clamp-2">
-                            {post.title}
+                            {getEnglishTitle(post.title)}
                           </h3>
                           <p className="text-[8px] xs:text-[9px] sm:text-[10px] md:text-xs lg:text-[13px] text-[#5D5D5D] leading-relaxed line-clamp-3">
                             {post.excerpt || post.description || '移住者の多い地域で始める新しい暮らし'}

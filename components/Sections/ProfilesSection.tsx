@@ -47,6 +47,24 @@ function Reveal({ children, delay = 0 }: RevealProps) {
   );
 }
 
+// ✅ NEW: Helper function to extract English part from bilingual title
+function getEnglishTitle(title: string): string {
+  const delimiters = ['|', '/', ' - '];
+  
+  for (const delimiter of delimiters) {
+    if (title.includes(delimiter)) {
+      const parts = title.split(delimiter).map(part => part.trim());
+      if (parts.length >= 2) {
+        // Return the first part (English)
+        return parts[0];
+      }
+    }
+  }
+  
+  // If no delimiter found, return the whole title
+  return title;
+}
+
 export default function ProfilesSection() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,30 +142,20 @@ export default function ProfilesSection() {
                   <article className="space-y-4 sm:space-y-5 md:space-y-6">
                     {/* Image with Vertical Text Overlay */}
                     <div className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                      {/* ✅ UPDATED: Image alt text with English only */}
                       <img
                         src={post.coverImage || defaultImage}
-                        alt={post.title}
+                        alt={getEnglishTitle(post.title)}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      
-                      {/* Vertical Text Overlay - Right Side */}
-                      <div className="absolute top-0 right-0 h-full flex items-center pr-4 sm:pr-5 md:pr-6 lg:pr-8">
-                        <div className="bg-black/40 backdrop-blur-sm px-3 sm:px-4 md:px-5 py-6 sm:py-8 md:py-10 lg:py-12 rounded-sm">
-                          <div 
-                            className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-light tracking-wider leading-relaxed"
-                            style={{ writingMode: 'vertical-rl', letterSpacing: '0.2em' }}
-                          >
-                            {post.title || 'タイトル'}のその後
-                          </div>
-                        </div>
-                      </div>
+
                     </div>
 
                     {/* Text Content Below Image */}
                     <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
-                      {/* Name */}
+                      {/* ✅ UPDATED: Name with English only */}
                       <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#3D3D3D]">
-                        {post.title}
+                        {getEnglishTitle(post.title)}
                       </h3>
                       
                       {/* Description */}

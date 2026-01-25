@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AnimatedVerticalTitle from '../UI/Animatedverticaltitle';
+import Link from 'next/link';
 
 type RevealProps = {
   children: React.ReactNode;
@@ -283,6 +284,17 @@ export default function RiyuuSection() {
             <p>
               地域の人と野菜とかね、もうう趣味を多くて、すぐく長くしてもらっています。家に満ると今日は雨のとうもと、ふきゅめのとうって話と場が多るって知ぬってる？
             </p>
+          </div>
+        </Reveal>
+        {/* Back to Home Link */}
+        <Reveal delay={200}>
+          <div className="flex justify-center mt-12 sm:mt-14 md:mt-16">
+            <Link 
+              href="/"
+              className="text-sm sm:text-base text-[#3D3D3D] hover:text-[#5D5D5D] transition-colors inline-flex items-center gap-2 border-b border-[#3D3D3D] hover:border-[#5D5D5D] pb-1"
+            >
+              ← ホームに戻る
+            </Link>
           </div>
         </Reveal>
       </div>

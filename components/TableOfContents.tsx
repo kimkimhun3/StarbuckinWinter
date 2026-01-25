@@ -23,21 +23,8 @@ export default function TableOfContents({
   const [activeId, setActiveId] = useState<string>('')
   const [isNavigating, setIsNavigating] = useState(false)
   
-  // ✅ NEW: Collapse state for mobile
+  // ✅ NEW: Collapse state for ALL screen sizes
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  
-  // ✅ NEW: Check if screen is mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1280) // xl breakpoint
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   useEffect(() => {
     // Extract headings from markdown content
@@ -193,16 +180,16 @@ export default function TableOfContents({
     return null
   }
 
-  // ✅ NEW: Determine how many items to show when collapsed
-  const COLLAPSED_LIMIT = 5 // Show only first 5 items on mobile when collapsed
-  const displayedHeadings = isMobile && !isExpanded 
+  // ✅ UPDATED: Show 10 items on ALL screens when collapsed
+  const COLLAPSED_LIMIT = 10 // Show first 10 items when collapsed
+  const displayedHeadings = !isExpanded 
     ? headings.slice(0, COLLAPSED_LIMIT) 
     : headings
   const hasMore = headings.length > COLLAPSED_LIMIT
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 xl:sticky xl:top-8">
-      {/* ✅ UPDATED: Header with expand/collapse button on mobile */}
+      {/* Header with expand/collapse button */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900 flex items-center">
           <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,11 +205,11 @@ export default function TableOfContents({
           )}
         </h2>
         
-        {/* ✅ NEW: Expand/Collapse button - only show on mobile when there are more items */}
-        {isMobile && hasMore && (
+        {/* ✅ UPDATED: Expand/Collapse button - show on ALL screens when there are more than 10 items */}
+        {hasMore && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="xl:hidden flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+            className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
             aria-label={isExpanded ? 'Show less' : 'Show more'}
           >
             <span>{isExpanded ? 'Less' : 'More'}</span>
@@ -263,8 +250,8 @@ export default function TableOfContents({
           ))}
         </ul>
         
-        {/* ✅ NEW: "Show More" text indicator on mobile */}
-        {isMobile && !isExpanded && hasMore && (
+        {/* ✅ UPDATED: "Show More" text indicator on ALL screens */}
+        {!isExpanded && hasMore && (
           <div className="mt-3 pt-3 border-t border-gray-200">
             <button
               onClick={() => setIsExpanded(true)}
@@ -277,7 +264,4 @@ export default function TableOfContents({
       </nav>
     </div>
   )
-  
-  
-
-  }
+}

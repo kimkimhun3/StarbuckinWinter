@@ -4,22 +4,22 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#F5F1E8] py-16">
+    <footer className="bg-[#F5F1E8] py-16" id='contact'>
       <div className="max-w-7xl mx-auto px-8">
         <div className="grid md:grid-cols-2 gap-12 mb-12">
           {/* Navigation Links */}
           <div className="space-y-4">
             <Link href="#about" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
-              つづきをつくる
+              そのさきへ
             </Link>
             <Link href="#sawada" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
-              暮らしのつづき
+              まだみえない
             </Link>
             <Link href="#kamo" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
-              風景のつづき
+              なにもきめずに
             </Link>
             <Link href="#house" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
-              空き家のつづき
+              ゆっくりでいい
             </Link>
           </div>
 
@@ -56,7 +56,7 @@ export default function Footer() {
         {/* Logo */}
         <div className="flex items-center justify-between border-t border-[#D4CFC4] pt-8">
           <div className="text-2xl font-medium text-[#3D3D3D] tracking-wider">
-            開宅舎
+            ここではないどこか
           </div>
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
