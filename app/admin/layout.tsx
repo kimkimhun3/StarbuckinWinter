@@ -79,6 +79,16 @@ export default function AdminLayout({
                 >
                   Comments
                 </Link>
+                <Link
+                  href="/admin/analytics"
+                  className={`${
+                    pathname === '/admin/analytics'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Analytics
+                </Link>
               </div>
             </div>
             <div className="flex items-center">
