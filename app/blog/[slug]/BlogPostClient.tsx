@@ -247,6 +247,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         () => setViewCount((c) => c + 1),
         (err) => console.error('Failed to increment view count:', err)
       )
+      apiClient.trackPageView(`/blog/${slug}`, initialPost.id).catch(() => {})
       loadRelatedPosts(initialPost.id)
     } else {
       loadPost()
@@ -306,6 +307,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
       } catch (err) {
         console.error('Failed to increment view count:', err)
       }
+      apiClient.trackPageView(`/blog/${slug}`, post.id).catch(() => {})
       
       // Load related posts
       await loadRelatedPosts(post.id)

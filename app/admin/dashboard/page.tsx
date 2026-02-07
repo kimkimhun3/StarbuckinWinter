@@ -11,6 +11,8 @@ interface Stats {
   draftPosts: number
   totalComments: number
   pendingComments: number
+  totalViews: number
+  topCountries: { country: string; views: number }[]
 }
 
 export default function AdminDashboard() {
@@ -21,6 +23,8 @@ export default function AdminDashboard() {
     draftPosts: 0,
     totalComments: 0,
     pendingComments: 0,
+    totalViews: 0,
+    topCountries: [],
   })
   const [recentPosts, setRecentPosts] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -34,15 +38,18 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const { posts } = await apiClient.getPosts(true)
-      
+      const [{ posts }, analytics] = await Promise.all([
+        apiClient.getPosts(true),
+        apiClient.getAnalytics(30).catch(() => null),
+      ])
+
       // Calculate stats
       const publishedPosts = posts.filter((p: any) => p.published).length
       const draftPosts = posts.filter((p: any) => !p.published).length
-      
+
       let totalComments = 0
       let pendingComments = 0
-      
+
       posts.forEach((post: any) => {
         const commentsCount = post._count?.comments || 0
         totalComments += commentsCount
@@ -54,6 +61,8 @@ export default function AdminDashboard() {
         draftPosts,
         totalComments,
         pendingComments,
+        totalViews: analytics?.totalViews || 0,
+        topCountries: analytics?.viewsByCountry?.slice(0, 5) || [],
       })
 
       // Get recent posts (last 5)
@@ -198,22 +207,59 @@ export default function AdminDashboard() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Quick Actions
+                    Page Views (30d)
                   </dt>
                   <dd className="text-lg font-semibold text-gray-900">
-                    <Link
-                      href="/admin/posts/new"
-                      className="text-indigo-600 hover:text-indigo-500 text-sm"
-                    >
-                      Create New Post
-                    </Link>
+                    {stats.totalViews.toLocaleString()}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
+          <div className="bg-gray-50 px-5 py-3">
+            <div className="text-sm">
+              <Link
+                href="/admin/analytics"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                View analytics
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Top Visitor Countries */}
+      {stats.topCountries.length > 0 && (
+        <div className="mt-8 bg-white shadow rounded-lg p-6">
+          <div className="sm:flex sm:items-center sm:justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Top Visitor Countries (30d)</h2>
+            <Link
+              href="/admin/analytics"
+              className="text-sm text-indigo-600 hover:text-indigo-500"
+            >
+              View full analytics
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+            {stats.topCountries.map((item) => (
+              <div key={item.country} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                <span className="text-2xl">
+                  {item.country
+                    .toUpperCase()
+                    .split('')
+                    .map((c: string) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+                    .join('')}
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{item.country}</p>
+                  <p className="text-xs text-gray-500">{item.views} views</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Posts */}
       <div className="mt-8">

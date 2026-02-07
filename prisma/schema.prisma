@@ -39,6 +39,7 @@ model Post {
   viewCount   Int      @default(0)
   tags        String[]
   comments    Comment[]
+  pageViews   PageView[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   publishedAt DateTime?
@@ -57,6 +58,22 @@ model Comment {
   approved  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([postId])
+}
+
+model PageView {
+  id            String   @id @default(cuid())
+  path          String
+  post          Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        String?
+  city          String?
+  country       String?
+  countryRegion String?
+  createdAt     DateTime @default(now())
+
+  @@index([postId])
+  @@index([createdAt])
+  @@index([country])
+  @@index([path])
 }

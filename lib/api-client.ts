@@ -138,6 +138,18 @@ export class ApiClient {
       body: JSON.stringify({ postId, content }),
     })
   }
+
+  // Analytics
+  async trackPageView(path: string, postId?: string) {
+    return this.request('/api/analytics/track', {
+      method: 'POST',
+      body: JSON.stringify({ path, postId }),
+    })
+  }
+
+  async getAnalytics(days = 30) {
+    return this.request(`/api/analytics?days=${days}`)
+  }
 }
 
 export const apiClient = new ApiClient()

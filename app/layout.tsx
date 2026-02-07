@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Analytics } from '@vercel/analytics/react';
+import PageViewTracker from "@/components/PageViewTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Analytics />
+          <PageViewTracker />
         </AuthProvider>
       </body>
     </html>
