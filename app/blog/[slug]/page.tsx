@@ -63,7 +63,7 @@ export async function generateMetadata({
       // Check if coverImage exists and is not empty
       if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
         // Return default image if no cover image provided
-        return `${siteUrl}/og-default.jpg`
+        return 'https://res.cloudinary.com/duvusa8ck/image/upload/v1768729098/profile_anvogi.png';
       }
       
       const trimmedUrl = imageUrl.trim()

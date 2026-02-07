@@ -1,9 +1,9 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Analytics } from '@vercel/analytics/react';
-import PageViewTracker from "@/components/PageViewTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,20 +16,48 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL('https://shiranai-michi.com'),
   title: {
-    default: 'しらないみちへ - Unknown Roads',
-    template: '%s | しらないみちへ',
+    default: 'Shiranai Michi - みちへしらない | Unknown Roads',
+    template: '%s | Shiranai Michi',
   },
-  description: 'A bilingual travel blog exploring Japanese culture and destinations',
+  description: 'Shiranai Michi (みちへしらない) - A bilingual travel blog exploring Japanese culture, hidden destinations, and authentic travel experiences in Japan.',
+  keywords: [
+    'Shiranai Michi',
+    'shiranai-michi',
+    'みちへしらない',
+    'Unknown Roads',
+    'Japan travel blog',
+    'Japanese culture',
+    'Japan destinations',
+    'travel Japan',
+    'Japan tourism',
+  ],
   openGraph: {
     type: 'website',
-    siteName: 'しらないみちへ (Unknown Roads)',
-    locale: 'ja_JP',
+    siteName: 'Shiranai Michi - Unknown Roads',
+    locale: 'en_US',
+    url: 'https://shiranai-michi.com',
+    title: 'Shiranai Michi - Unknown Roads',
+    description: 'Explore Japan through authentic travel stories and cultural insights',
+    images: [
+      {
+        url: 'https://res.cloudinary.com/duvusa8ck/image/upload/v1768729098/profile_anvogi.png',
+        width: 1200,
+        height: 630,
+        alt: 'Shiranai Michi',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    creator: '@your_twitter_handle',
+    title: 'Shiranai Michi - Unknown Roads',
+    description: 'Explore Japan through authentic travel stories',
+    images: ['https://res.cloudinary.com/duvusa8ck/image/upload/v1768729098/profile_anvogi.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 
@@ -46,7 +74,6 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <Analytics />
-          <PageViewTracker />
         </AuthProvider>
       </body>
     </html>
