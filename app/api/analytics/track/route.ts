@@ -51,16 +51,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Send email notification asynchronously (don't block the response)
-    sendPageViewNotification({
-      path,
-      city: decodedCity,
-      country,
-      countryRegion,
-      postTitle,
-    }).catch((error) => {
-      console.error('Email notification error:', error)
-    })
+    // ✅ ONLY send email notification if NOT an admin page
+    const isAdminPage = path.startsWith('/admin')
+    
+    if (!isAdminPage) {
+      // Send email notification asynchronously (don't block the response)
+      sendPageViewNotification({
+        path,
+        city: decodedCity,
+        country,
+        countryRegion,
+        postTitle,
+      }).catch((error) => {
+        console.error('Email notification error:', error)
+      })
+    } else {
+      console.log('Skipping email notification for admin page:', path)
+    }
 
     return NextResponse.json({ success: true, id: pageView.id })
   } catch (error) {
