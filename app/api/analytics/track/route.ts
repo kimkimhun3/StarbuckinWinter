@@ -1,7 +1,8 @@
+// app/api/analytics/track/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { sendPageViewNotification } from '@/lib/email'
 
-// POST /api/analytics/track - Record a page view with geo data from Vercel headers
 export async function POST(request: NextRequest) {
   try {
     const { path, postId } = await request.json()
@@ -32,15 +33,34 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // If tracking a specific post, also increment the post's viewCount
+    // Get post title if tracking a specific post
+    let postTitle = null
     if (postId) {
-      await prisma.post.update({
+      const post = await prisma.post.findUnique({
         where: { id: postId },
-        data: {
-          viewCount: { increment: 1 },
-        },
+        select: { title: true },
       })
+      
+      if (post) {
+        postTitle = post.title
+        // Increment view count
+        await prisma.post.update({
+          where: { id: postId },
+          data: { viewCount: { increment: 1 } },
+        })
+      }
     }
+
+    // Send email notification asynchronously (don't block the response)
+    sendPageViewNotification({
+      path,
+      city: decodedCity,
+      country,
+      countryRegion,
+      postTitle,
+    }).catch((error) => {
+      console.error('Email notification error:', error)
+    })
 
     return NextResponse.json({ success: true, id: pageView.id })
   } catch (error) {
