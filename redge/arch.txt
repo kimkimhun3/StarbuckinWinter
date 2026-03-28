@@ -1,0 +1,159 @@
+BASH (pipeline string — GStreamer handles everything automatically)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[IP Camera]
+    │ RTSP H.264
+    ▼
+rtspsrc → rtph264depay → h264parse → v4l2h264dec → imxvideoconvert_g2d
+    │                                                               │
+    │                                               raw video frame │
+    │                                                               ▼
+    │                                                        mix.sink_0
+    │                                                               │
+    │                                                               ▼
+    │                                               ┌─────────────────────────┐
+    │                                               │   imxcompositor_g2d     │
+    │                                               │   (PNG placed HERE)     │
+    │                                               │                         │
+    │                                               │  sink_0 = video frame   │
+    │                                               │  sink_1 = PNG overlay   │
+    │                                               │       ↓ merged          │
+    │                                               └─────────────────────────┘
+    │                                                               │
+    │                                               merged raw frame│
+    │                                                               ▼
+    │                                        imxvideoconvert_g2d → v4l2h264enc
+    │                                                               │
+    │                                                               ▼
+    │                                               rtph264pay → multiudpsink
+    │                                                               │
+    │                                                               ▼
+    │                                                         [VLC / Viewer]
+    │
+[PNG file on disk]
+    │
+filesrc → pngdec → imagefreeze → videoconvert → videocrop → videoscale → capsfilter
+    │                                                                          │
+    │                                                    RGBA $height x $height│
+    │                                                                          ▼
+    │                                                                   mix.sink_1
+    │                                                                          │
+    └──────────────────────────────────────────────────────────────────────────┘
+
+
+PYTHON (only controls compositor pad properties — never touches pixels)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RETI-process.sh detects zoom change
+    │
+    ▼
+HTTP GET /scale?value=X
+    │
+    ▼
+request_set_scale(X)
+    │
+    ▼
+_apply_scale_by_pad(X)
+    │
+    ├── pad1.set_property("width",  overlay_size)   ┐
+    ├── pad1.set_property("height", overlay_size)   │ tells compositor
+    ├── pad1.set_property("xpos",   xpos)           │ how big and where
+    └── pad1.set_property("ypos",   ypos)           ┘ to place sink_1
+
+
+
+
+    --------------------------------
+
+
+
+    PIP_CMD="$PIP_RTSP ! $PIP_DECODE ! $PIP_VRATE ! $PIP_VCONVERT1 $PIP_CONPOSIT ! $PIP_VCONVERT2 ! $PIP_AVCENC ! $PIP_RTP ! $PIP_DELIV $PIP_PNG"
+```
+
+---
+
+**Full correct pipeline diagram:**
+```
+BRANCH A — Camera Video:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[IP Camera]
+    │ RTSP H.264
+    ▼
+PIP_RTSP
+rtspsrc location=rtsp://...
+    │
+    ▼
+PIP_DECODE
+rtph264depay ! h264parse ! v4l2h264dec
+    │ raw decoded frames
+    ▼
+PIP_VRATE
+videorate drop-only=true max-rate=$IN_FPS
+! video/x-raw,framerate=$IN_FPS/1
+    │ framerate locked
+    ▼
+PIP_VCONVERT1
+imxvideoconvert_g2d ! queue
+    │ format converted
+    ▼
+mix.sink_0 ───────────────────────────┐
+                                      │
+                                      ▼
+                          PIP_CONPOSIT
+                          imxcompositor_g2d (mix)   ← merge happens HERE
+                                      ▲
+mix.sink_1 ───────────────────────────┘
+    ▲
+    │ format converted, RGBA $height x $height
+    │
+PIP_PNG
+filesrc ! pngdec ! imagefreeze
+! videoconvert ! videocrop
+! videoscale ! capsfilter
+! queue
+    ▲
+[PNG file on disk]
+
+
+BRANCH A continues after compositor:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+imxcompositor_g2d output
+    │ merged raw frame
+    ▼
+PIP_VCONVERT2
+imxvideoconvert_g2d
+! videorate drop-only=true max-rate=$fps
+! video/x-raw,width=$width,height=$height,framerate=$fps/1
+    │ final format locked for encoder
+    ▼
+PIP_AVCENC
+v4l2h264enc ...
+    │ H.264 encoded
+    ▼
+PIP_RTP
+h264parse ! rtph264pay pt=96 mtu=$mtu
+    │ RTP packets
+    ▼
+PIP_DELIV
+multiudpsink clients=$DELIVERY_URL
+    │
+    ▼
+[VLC / Viewer]
+
+
+PYTHON — only controls compositor pad properties:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RETI-process.sh detects zoom
+    │
+    ▼
+HTTP GET /scale?value=X
+    │
+    ▼
+_apply_scale_by_pad(X)
+    ├── pad1.width  = video_height * scale
+    ├── pad1.height = video_height * scale
+    ├── pad1.xpos   = (video_width - overlay_size) / 2
+    └── pad1.ypos   = (video_height - overlay_size) / 2

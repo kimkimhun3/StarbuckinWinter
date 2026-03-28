@@ -5,11 +5,11 @@ export default function SchoolSection() {
     <section id="school" className="bg-[#3D3D3D] py-32">
       <div className="max-w-5xl mx-auto px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-light text-white mb-8">
-          ノックの学校
+          ここには何もない
         </h2>
         <p className="text-[#D4CFC4] text-lg leading-relaxed mb-12">
-          空き家問題や移住促進に取り組む各地の方へ<br />
-          開宅のノウハウを伝える研修を開いています
+          ここには何もありません。他の場所にスクロールするか、<br />
+          メインページに戻ってください。
         </p>
         <Link 
           href="#school"

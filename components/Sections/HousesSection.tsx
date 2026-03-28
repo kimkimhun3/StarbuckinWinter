@@ -186,7 +186,7 @@ export default function HousesSection() {
                 <div className="relative">
                   <div className="w-36 xs:w-40 sm:w-48 md:w-56 lg:w-64 xl:w-72 2xl:w-80 h-36 xs:h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 2xl:h-80 rounded-full overflow-hidden shadow-lg ring-2 xs:ring-3 sm:ring-4 ring-white/50">
                     <img
-                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600"
+                      src="https://res.cloudinary.com/duvusa8ck/image/upload/v1774685372/hitori_kob2n4.png"
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
