@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/auth-context'
 import { apiClient } from '@/lib/api-client'
 import PublicNav from '@/components/PublicNav'
@@ -138,7 +137,7 @@ function BilingualTitle({
                   {columnChars.map((char, charIndex) => (
                     <span
                       key={charIndex}
-                      className="inline-block text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-jp text-ink-soft dark:text-paper"
+                      className="inline-block text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-serif text-gray-700"
                       style={{
                         fontFamily: "'Noto Serif JP', 'Yu Mincho', 'YuMincho', serif",
                         writingMode: 'horizontal-tb',
@@ -156,16 +155,19 @@ function BilingualTitle({
         </div>
 
         {/* Vertical Divider Line - DYNAMIC HEIGHT */}
-        <div
-          className="w-px bg-ink/30 dark:bg-paper/30 flex-shrink-0 transition-all duration-300"
+        <div 
+          className="w-px bg-gray-400 flex-shrink-0 transition-all duration-300"
           style={{ height: dividerHeight > 0 ? `${dividerHeight}px` : 'auto' }}
         ></div>
 
         {/* RIGHT SIDE - English Title (Horizontal) */}
         <div className="flex-1 flex justify-start pl-3 sm:pl-6 md:pl-8 lg:pl-12 items-center">
-          <h1
+          <h1 
             ref={englishRef}
-            className="font-display text-sm sm:text-base md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl italic text-ink-soft leading-relaxed dark:text-paper"
+            className="text-sm sm:text-base md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-normal text-gray-700 leading-relaxed"
+            style={{
+              fontFamily: "'Georgia', serif",
+            }}
           >
             {englishTitle}
           </h1>
@@ -447,10 +449,9 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
 
   if (isLoading || !fontsLoaded) {
     return (
-      <div className="min-h-screen bg-paper dark:bg-midnight">
-        <PublicNav />
+      <div className="min-h-screen">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ember"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
       </div>
     )
@@ -458,14 +459,13 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-paper dark:bg-midnight">
-        <PublicNav />
+      <div className="min-h-screen">
         <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-          <h1 className="font-display text-4xl italic text-ink-soft mb-4 dark:text-paper">Post Not Found</h1>
-          <p className="text-ink-muted mb-8 dark:text-ink-faint">The post you're looking for doesn't exist.</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Post Not Found</h1>
+          <p className="text-gray-600 mb-8">The post you're looking for doesn't exist.</p>
           <Link
             href="/blog"
-            className="inline-flex items-center px-6 py-3 border-b border-ink-soft/40 text-base font-medium text-ink-soft hover:border-ember hover:text-ember transition-colors dark:text-paper"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
           >
             ← Back to Blog
           </Link>
@@ -480,14 +480,12 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
   const displayContent = currentLanguage === 'ja' ? translatedContent : post.content
 
   return (
-    <div className="min-h-screen bg-paper dark:bg-midnight">
-      <PublicNav />
-
+    <div className="min-h-screen bg-white">
       {/* Floating Language Switcher Button - Fixed Bottom Left */}
       <button
         onClick={handleLanguageSwitch}
         disabled={isTranslatingContent}
-        className="fixed bottom-6 left-6 z-50 flex items-center space-x-2 px-4 py-3 bg-ink-soft text-paper rounded-full shadow-lg hover:bg-ember transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl transform hover:scale-105 dark:bg-paper dark:text-ink-soft"
+        className="fixed bottom-6 left-6 z-50 flex items-center space-x-2 px-4 py-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl transform hover:scale-105"
         aria-label="Switch language"
       >
         {isTranslatingContent ? (
@@ -505,23 +503,18 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         )}
       </button>
 
-      {/* Cinematic Hero Section - Centered Image with Bilingual Titles Below */}
+      {/* Japanese-Style Hero Section - Centered Image with Bilingual Titles Below */}
       {post.coverImage && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full py-8 sm:py-12 md:py-16 px-2 sm:px-4"
-        >
-          <div className="max-w-5xl mx-auto">
+        <div className="w-full py-8 sm:py-12 md:py-16 px-2 sm:px-4">
+          <div className="max-w-4xl mx-auto">
             {/* Centered Cover Image - No border */}
-            <div className="mb-4 sm:mb-6 overflow-hidden">
+            <div className="mb-4 sm:mb-6">
               <img
                 src={post.coverImage}
                 alt={englishTitle}
                 className="w-full h-auto"
-                style={{
-                  maxHeight: '600px',
+                style={{ 
+                  maxHeight: '500px',
                   objectFit: 'contain',
                 }}
                 loading="eager"
@@ -529,7 +522,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
             </div>
 
             {/* Image Caption/Source with Date and Location */}
-            <div className="text-center text-xs sm:text-sm text-ink-faint mb-4 sm:mb-6 md:mb-8 space-y-1">
+            <div className="text-center text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 md:mb-8 space-y-1">
               <p className="font-medium">凛</p>
               <p>
                 {new Date(post.createdAt).toLocaleDateString('ja-JP', {
@@ -541,12 +534,12 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
             </div>
 
             {/* Bilingual Title Section - Japanese (Left/Vertical) | English (Right/Horizontal) */}
-            <BilingualTitle
-              japaneseTitle={japaneseTitle}
+            <BilingualTitle 
+              japaneseTitle={japaneseTitle} 
               englishTitle={englishTitle}
             />
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Post Content Container */}
@@ -555,18 +548,18 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         <article className="mb-8">
           <div className="p-6 sm:p-8 md:p-12">
             {/* Post Meta Information - Single Line with Share Button */}
-            <div className="pb-4 mb-6 border-b border-ink/10 dark:border-paper/10">
+            <div className="pb-4 mb-6 border-b border-gray-200">
               <div className="flex items-center justify-between gap-2">
                 {/* Left side - Meta info */}
                 <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm overflow-hidden">
                   {/* Author - Always visible */}
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 bg-ember/15 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-ember font-medium text-[10px] sm:text-xs">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-indigo-600 font-medium text-[10px] sm:text-xs">
                         {(post.authorName || post.author?.name || 'A')[0].toUpperCase()}
                       </span>
                     </div>
-                    <span className="font-medium text-ink-soft dark:text-paper truncate max-w-[80px] sm:max-w-none">
+                    <span className="font-medium text-gray-900 truncate max-w-[80px] sm:max-w-none">
                       {post.authorName || post.author?.name || 'Anonymous'}
                     </span>
                   </div>
@@ -574,8 +567,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                   <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
                   
                   {/* Date */}
-                  <div className="flex items-center gap-1 text-ink-muted dark:text-ink-faint flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-ink-faint hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <time className="hidden sm:inline">
@@ -596,8 +589,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                   <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
                   
                   {/* View Count */}
-                  <div className="flex items-center gap-1 text-ink-muted dark:text-ink-faint flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-ink-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -607,8 +600,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                   <span className="text-gray-300 hidden sm:inline flex-shrink-0">•</span>
                   
                   {/* Comments Count */}
-                  <div className="flex items-center gap-1 text-ink-muted dark:text-ink-faint flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-ink-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-1 text-gray-600 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                     </svg>
                     <span className="text-[11px] sm:text-xs">{post.comments.length}</span>
@@ -625,7 +618,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                       flex items-center gap-1 px-2 py-1 rounded-full transition-all duration-200 flex-shrink-0
                       ${hasLoved 
                         ? 'bg-red-50 text-red-600' 
-                        : 'bg-gray-100 text-ink-muted dark:text-ink-faint hover:bg-red-50 hover:text-red-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
                       }
                       ${isLoving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                     `}
@@ -684,11 +677,11 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                 {isTranslatingContent ? (
                   <div className="flex items-center justify-center py-20">
                     <div className="text-center">
-                      <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-ember" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <p className="text-ink-muted dark:text-ink-faint">翻訳中...</p>
+                      <p className="text-gray-600">翻訳中...</p>
                     </div>
                   </div>
                 ) : (
@@ -716,7 +709,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                 <Link
                   key={index}
                   href={`/all?tag=${encodeURIComponent(tag)}`}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-ember/10 text-ember hover:bg-ember/20 hover:text-ember transition-colors text-sm font-medium"
+                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 transition-colors text-sm font-medium"
                 >
                   #{tag}
                 </Link>
@@ -727,8 +720,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
 
         {/* Comments Section */}
         <div className="max-w-3xl mx-auto sm:p-8 mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-ink-soft dark:text-paper mb-6 flex items-center">
-            <svg className="w-7 h-7 mr-3 text-ember" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center">
+            <svg className="w-7 h-7 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
             </svg>
             Comments ({post.comments.length})
@@ -739,8 +732,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
             <form onSubmit={handleCommentSubmit} className="mb-8">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-ember/15 rounded-full flex items-center justify-center">
-                    <span className="text-ember font-medium">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span className="text-indigo-600 font-medium">
                       {user.name?.[0]?.toUpperCase() || 'U'}
                     </span>
                   </div>
@@ -751,7 +744,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                     onChange={(e) => setCommentContent(e.target.value)}
                     placeholder="Write a comment..."
                     rows={4}
-                    className="w-full px-4 py-3 border border-ink/20 dark:border-paper/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-ember focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                     required
                   />
                   {commentSuccess && (
@@ -768,7 +761,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                     <button
                       type="submit"
                       disabled={isSubmittingComment || !commentContent.trim()}
-                      className="px-6 py-2 bg-ember text-white rounded-lg hover:bg-ember/90 disabled:bg-ember/50 disabled:cursor-not-allowed transition-colors font-medium"
+                      className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors font-medium"
                     >
                       {isSubmittingComment ? (
                         <span className="flex items-center">
@@ -785,21 +778,21 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
               </div>
             </form>
           ) : (
-            <div className="mb-8 p-6 border border-ember/30 rounded-lg text-center">
-              <p className="text-ink-muted dark:text-ink-faint mb-3 text-sm sm:text-base">
+            <div className="mb-8 p-6 border border-indigo-200 rounded-lg text-center">
+              <p className="text-gray-700 mb-3 text-sm sm:text-base">
                 コメントするには、ログインまたは新規登録してください
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link 
                   href={`/login?redirect=${encodeURIComponent(`/blog/${post.slug}`)}`}
-                  className="w-full sm:w-auto px-6 py-2 bg-ember text-white rounded-lg hover:bg-ember/90 font-medium transition-colors text-center"
+                  className="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors text-center"
                 >
                   ログイン
                 </Link>
-                <span className="hidden sm:inline text-ink-faint">または</span>
+                <span className="hidden sm:inline text-gray-400">または</span>
                 <Link 
                   href={`/register?redirect=${encodeURIComponent(`/blog/${post.slug}`)}`}
-                  className="w-full sm:w-auto px-6 py-2 bg-white text-ember border-2 border-ember rounded-lg hover:bg-ember/10 font-medium transition-colors text-center"
+                  className="w-full sm:w-auto px-6 py-2 bg-white text-indigo-600 border-2 border-indigo-600 rounded-lg hover:bg-indigo-50 font-medium transition-colors text-center"
                 >
                   新規登録
                 </Link>
@@ -811,30 +804,30 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
           <div className="space-y-6">
             {post.comments.length === 0 ? (
               <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-ink-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                 </svg>
-                <p className="mt-4 text-ink-faint font-medium">No comments yet</p>
-                <p className="text-ink-faint text-sm">Be the first to share your thoughts!</p>
+                <p className="mt-4 text-gray-500 font-medium">No comments yet</p>
+                <p className="text-gray-400 text-sm">Be the first to share your thoughts!</p>
               </div>
             ) : (
               post.comments.map((comment: any) => (
-                <div key={comment.id} className="border-b border-ink/10 dark:border-paper/10 pb-6 last:border-b-0 last:pb-0">
+                <div key={comment.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-ember/15 rounded-full flex items-center justify-center">
-                        <span className="text-ember font-medium">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <span className="text-indigo-600 font-medium">
                           {comment.author.name?.[0]?.toUpperCase() || 'A'}
                         </span>
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center flex-wrap gap-2">
-                        <span className="font-semibold text-ink-soft dark:text-paper">
+                        <span className="font-semibold text-gray-900">
                           {comment.author.name || 'Anonymous'}
                         </span>
-                        <span className="text-ink-faint">•</span>
-                        <time className="text-sm text-ink-faint">
+                        <span className="text-gray-400">•</span>
+                        <time className="text-sm text-gray-500">
                           {new Date(comment.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
@@ -842,7 +835,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                           })}
                         </time>
                       </div>
-                      <p className="mt-2 text-ink-muted dark:text-ink-faint leading-relaxed break-words">{comment.content}</p>
+                      <p className="mt-2 text-gray-700 leading-relaxed break-words">{comment.content}</p>
                     </div>
                   </div>
                 </div>
@@ -854,8 +847,8 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         {/* More Posts Section */}
         {relatedPosts.length > 0 && (
           <div className="mb-12">
-            <div className="border-t border-ink/10 dark:border-paper/10 pt-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-ink-soft dark:text-paper mb-8">
+            <div className="border-t border-gray-200 pt-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
                 More Posts
               </h2>
               
@@ -880,15 +873,15 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
                       
                       {/* Content - Adjusted text sizes for mobile */}
                       <div className="flex-1 flex flex-col">
-                        <h3 className="text-sm sm:text-lg lg:text-xl font-semibold text-ink-soft dark:text-paper mb-1 sm:mb-2 line-clamp-2 group-hover:text-ember transition-colors leading-tight">
+                        <h3 className="text-sm sm:text-lg lg:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors leading-tight">
                           {relatedPost.title}
                         </h3>
                         
-                        <p className="text-xs sm:text-sm text-ink-muted dark:text-ink-faint mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 flex-1">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 flex-1">
                           {relatedPost.excerpt || relatedPost.description || ''}
                         </p>
                         
-                        <div className="flex items-center text-[10px] sm:text-xs text-ink-faint">
+                        <div className="flex items-center text-[10px] sm:text-xs text-gray-500">
                           <time className="truncate">
                             {new Date(relatedPost.createdAt).toLocaleDateString('en-US', {
                               year: 'numeric',
@@ -916,7 +909,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         <div className="mb-12 text-center">
           <Link
             href="/blog"
-            className="inline-flex items-center text-ember hover:text-ember/80 font-medium transition-colors group"
+            className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium transition-colors group"
           >
             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
