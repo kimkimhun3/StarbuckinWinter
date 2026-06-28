@@ -2,10 +2,7 @@
 
 import Hero from '@/components/Hero/Hero'
 import IntroSection from '@/components/Sections/IntroSection'
-import JourneyTimeline from '@/components/Sections/JourneyTimeline'
 import HousesSection from '@/components/Sections/HousesSection'
-import SeasonalJourneys from '@/components/Sections/SeasonalJourneys'
-import JapanMap from '@/components/Sections/JapanMap'
 import ProfilesSection from '@/components/Sections/ProfilesSection'
 import LandscapeSection from '@/components/Sections/LandscapeSection'
 import MagazineSection from '@/components/Sections/MagazineSection'
@@ -17,14 +14,11 @@ import '@/styles/globals.css'
 
 export default function HomePage() {
   return (
-    <main className="bg-paper dark:bg-midnight">
+    <main className="bg-[#F5F1E8]">
       {/* <LoadingScreen /> */}
       <Hero />
       <IntroSection />
-      <JourneyTimeline />
       <HousesSection />
-      <SeasonalJourneys />
-      <JapanMap />
       <ProfilesSection />
       {/* <LandscapeSection /> */}
       <MagazineSection />
