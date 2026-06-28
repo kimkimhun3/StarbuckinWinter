@@ -2,53 +2,53 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import ThemeToggle from '@/components/UI/ThemeToggle'
 
 export default function PublicNav() {
   const { user, logout } = useAuth()
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-indigo-600">
-              Travel Blog
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/"
-              className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Blog
-            </Link>
-            {user ? (
-              <>
-                {user.role === 'ADMIN' && (
-                  <Link
-                    href="/admin/dashboard"
-                    className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Admin
-                  </Link>
-                )}
-                <span className="text-sm text-gray-600">{user.name || user.email}</span>
-                <button
-                  onClick={logout}
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/admin/login"
-                className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium"
+    <nav className="sticky top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur-md dark:border-paper/10 dark:bg-midnight/90">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="font-display text-lg italic tracking-wide text-ink-soft dark:text-paper">
+          みちへしらない
+          <span className="ml-2 hidden text-xs not-italic uppercase tracking-widest2 text-ink-muted dark:text-ink-faint sm:inline">
+            Unknown Roads
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-5 text-sm">
+          <Link href="/all" className="text-ink-muted transition-colors hover:text-ink-soft dark:text-ink-faint dark:hover:text-paper">
+            Journal
+          </Link>
+          <Link href="/aboutme" className="text-ink-muted transition-colors hover:text-ink-soft dark:text-ink-faint dark:hover:text-paper">
+            About
+          </Link>
+
+          {user ? (
+            <>
+              {user.role === 'ADMIN' && (
+                <Link href="/admin/dashboard" className="text-ink-muted transition-colors hover:text-ink-soft dark:text-ink-faint dark:hover:text-paper">
+                  Admin
+                </Link>
+              )}
+              <button
+                onClick={logout}
+                className="text-ink-muted transition-colors hover:text-ink-soft dark:text-ink-faint dark:hover:text-paper"
               >
-                Login
-              </Link>
-            )}
-          </div>
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="border-b border-ink-soft/40 pb-0.5 text-ink-soft transition-colors hover:border-ember hover:text-ember dark:border-paper/30 dark:text-paper"
+            >
+              Login
+            </Link>
+          )}
+
+          <ThemeToggle />
         </div>
       </div>
     </nav>

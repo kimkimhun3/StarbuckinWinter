@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Shiranai Michi — Editorial Design System
+   ============================================================ */
+:root {
+  --color-paper: #F5F1E8;
+  --color-ink: #1C1C1A;
+}
+
+.dark {
+  --color-paper: #0E0F10;
+  --color-ink: #F5F1E8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: #C0512F;
+  color: #F5F1E8;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-jp {
+  font-family: var(--font-jp), 'Yu Mincho', YuMincho, serif;
+  font-display: swap;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Chapter index numerals used across editorial sections */
+.chapter-number {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  opacity: 0.35;
+}
+
+/* Dark-mode aware prose for article bodies */
+.dark .prose {
+  color: #E7E3D8;
+}
+
+.dark .prose strong,
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4 {
+  color: #F5F1E8;
+}
+
+.dark .prose a {
+  color: #E8916B;
+}
+
+.dark .prose blockquote {
+  border-left-color: #2A2B2E;
+  color: #9D9D9D;
+}
+
+.dark .prose code {
+  background-color: #2A2B2E;
+  color: #E8916B;
+}
+
 /* Markdown Editor Styling - Fixed with Scrolling */
 .markdown-editor .EasyMDEContainer {
   position: relative;
