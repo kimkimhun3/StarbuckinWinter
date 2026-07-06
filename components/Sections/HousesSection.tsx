@@ -191,8 +191,8 @@ export default function HousesSection() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  {/* Yellow Badge */}
-                  <div className="absolute top-0 right-0 bg-[#FFE500] text-[#3D3D3D] text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-medium px-2 py-1.5 xs:px-2.5 xs:py-1.5 sm:px-3 sm:py-2 md:px-3.5 md:py-2 lg:px-4 lg:py-2.5 rounded-full shadow-md text-center leading-tight">
+                  {/* Seal Badge */}
+                  <div className="absolute top-0 right-0 bg-[#A63A32] text-[#F5F1E8] text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-medium px-2 py-1.5 xs:px-2.5 xs:py-1.5 sm:px-3 sm:py-2 md:px-3.5 md:py-2 lg:px-4 lg:py-2.5 rounded-full shadow-md text-center leading-tight ring-1 ring-[#F5F1E8]/40">
                     About<br />Me
                   </div>
                 </div>

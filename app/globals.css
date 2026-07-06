@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+:root {
+  --color-washi: #F5F1E8;
+  --color-ink: #2F2F2F;
+  --color-ink-soft: #5D5D5D;
+  --color-line: #D4CFC4;
+  --color-accent-ai: #3E4A61;
+  --color-accent-shu: #A63A32;
+}
+
+body {
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-shippori), serif;
+}
+
 /* Markdown Editor Styling - Fixed with Scrolling */
 .markdown-editor .EasyMDEContainer {
   position: relative;

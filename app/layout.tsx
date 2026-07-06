@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Analytics } from '@vercel/analytics/react';
@@ -12,6 +12,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const shipporiMincho = Shippori_Mincho({
+  variable: "--font-shippori",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
@@ -69,7 +75,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${shipporiMincho.variable} antialiased bg-[#F5F1E8]`}
       >
         <AuthProvider>
           {children}
