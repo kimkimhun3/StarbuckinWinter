@@ -36,30 +36,30 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
 
   return (
     <article className="prose prose-slate lg:prose-lg xl:prose-xl max-w-none
-      prose-headings:font-bold prose-headings:text-gray-900 prose-headings:tracking-tight
+      prose-headings:font-medium prose-headings:text-[#2F2F2F] prose-headings:tracking-tight
       prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8 prose-h1:leading-tight
-      prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-200
+      prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-8 prose-h2:pb-2 prose-h2:border-b prose-h2:border-[#E5E1D6]
       prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-6
       prose-h4:text-xl prose-h4:mb-3 prose-h4:mt-5
-      prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-base
-      prose-a:text-indigo-600 prose-a:no-underline prose-a:font-medium hover:prose-a:underline hover:prose-a:text-indigo-800 prose-a:transition-colors
-      prose-strong:text-gray-900 prose-strong:font-semibold
-      prose-em:text-gray-800 prose-em:italic
-      prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-      prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:overflow-x-auto prose-pre:shadow-lg prose-pre:my-6
-      prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-50 prose-blockquote:pl-6 prose-blockquote:pr-4 prose-blockquote:py-4 prose-blockquote:italic prose-blockquote:text-gray-700 prose-blockquote:rounded-r-lg prose-blockquote:my-6
+      prose-p:text-[#3F3F3F] prose-p:leading-relaxed prose-p:mb-6 prose-p:text-base
+      prose-a:text-[#3E4A61] prose-a:no-underline prose-a:font-medium hover:prose-a:underline hover:prose-a:text-[#2E3749] prose-a:transition-colors
+      prose-strong:text-[#2F2F2F] prose-strong:font-semibold
+      prose-em:text-[#3F3F3F] prose-em:italic
+      prose-code:text-[#A63A32] prose-code:bg-[#F0ECE1] prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+      prose-pre:bg-[#2B2B28] prose-pre:text-gray-100 prose-pre:rounded-sm prose-pre:p-6 prose-pre:overflow-x-auto prose-pre:shadow-lg prose-pre:my-6
+      prose-blockquote:border-l-4 prose-blockquote:border-[#3E4A61] prose-blockquote:bg-[#3E4A61]/5 prose-blockquote:pl-6 prose-blockquote:pr-4 prose-blockquote:py-4 prose-blockquote:italic prose-blockquote:text-[#3F3F3F] prose-blockquote:rounded-r-sm prose-blockquote:my-6
       prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-6 prose-ul:space-y-2
       prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-6 prose-ol:space-y-2
-      prose-li:text-gray-700 prose-li:leading-relaxed
-      prose-li:marker:text-indigo-500
-      prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8 prose-img:w-full prose-img:h-auto
-      prose-hr:border-gray-300 prose-hr:my-10 prose-hr:border-t-2
+      prose-li:text-[#3F3F3F] prose-li:leading-relaxed
+      prose-li:marker:text-[#3E4A61]
+      prose-img:rounded-sm prose-img:shadow-lg prose-img:my-8 prose-img:w-full prose-img:h-auto
+      prose-hr:border-[#D4CFC4] prose-hr:my-10 prose-hr:border-t-2
       prose-table:border-collapse prose-table:w-full prose-table:my-6 prose-table:text-sm
-      prose-thead:bg-gray-100
-      prose-th:border prose-th:border-gray-300 prose-th:p-3 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900
-      prose-td:border prose-td:border-gray-300 prose-td:p-3 prose-td:text-gray-700
-      prose-tr:border-b prose-tr:border-gray-200 hover:prose-tr:bg-gray-50
-      prose-video:rounded-xl prose-video:shadow-lg prose-video:my-8 prose-video:w-full
+      prose-thead:bg-[#F0ECE1]
+      prose-th:border prose-th:border-[#D4CFC4] prose-th:p-3 prose-th:text-left prose-th:font-semibold prose-th:text-[#2F2F2F]
+      prose-td:border prose-td:border-[#D4CFC4] prose-td:p-3 prose-td:text-[#3F3F3F]
+      prose-tr:border-b prose-tr:border-[#E5E1D6] hover:prose-tr:bg-[#F5F1E8]
+      prose-video:rounded-sm prose-video:shadow-lg prose-video:my-8 prose-video:w-full
       ">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
@@ -93,56 +93,56 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
             return (
               <a
                 {...props}
-                className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition-colors duration-200"
+                className="text-[#3E4A61] hover:text-[#2E3749] hover:underline font-medium transition-colors duration-200"
                 target={isExternal ? '_blank' : undefined}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
               />
             );
           },
-          
+
           // Blockquotes - enhanced styling
           blockquote: ({ node, ...props }) => (
             <blockquote
               {...props}
-              className="border-l-4 border-indigo-500 bg-indigo-50 pl-6 pr-4 py-4 italic text-gray-700 rounded-r-lg my-6"
+              className="border-l-4 border-[#3E4A61] bg-[#3E4A61]/5 pl-6 pr-4 py-4 italic text-[#3F3F3F] rounded-r-sm my-6"
             />
           ),
-          
+
           // Code blocks
           pre: ({ node, ...props }) => (
             <div className="relative my-6">
               <pre
                 {...props}
-                className="bg-gray-900 text-gray-100 rounded-xl p-6 overflow-x-auto shadow-lg"
+                className="bg-[#2B2B28] text-gray-100 rounded-sm p-6 overflow-x-auto shadow-lg"
               />
             </div>
           ),
-          
+
           // Inline code
           code: ({ node, inline, ...props }: any) => {
             if (inline) {
               return (
                 <code
                   {...props}
-                  className="text-pink-600 bg-gray-100 px-2 py-1 rounded text-sm font-mono"
+                  className="text-[#A63A32] bg-[#F0ECE1] px-2 py-1 rounded text-sm font-mono"
                 />
               );
             }
             return <code {...props} />;
           },
-          
+
           // Tables
           table: ({ node, ...props }) => (
-            <div className="overflow-x-auto my-6 rounded-lg border border-gray-300">
-              <table {...props} className="min-w-full divide-y divide-gray-300" />
+            <div className="overflow-x-auto my-6 rounded-sm border border-[#D4CFC4]">
+              <table {...props} className="min-w-full divide-y divide-[#D4CFC4]" />
             </div>
           ),
-          
+
           // Headings - with mapped IDs
           h1: ({ node, children, ...props }) => {
             const id = getHeadingId(children)
             return (
-              <h1 {...props} id={id} className="text-4xl font-bold mb-6 mt-8 text-gray-900 leading-tight scroll-mt-24">
+              <h1 {...props} id={id} className="text-4xl font-medium mb-6 mt-8 text-[#2F2F2F] leading-tight scroll-mt-24">
                 {children}
               </h1>
             )
@@ -150,7 +150,7 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
           h2: ({ node, children, ...props }) => {
             const id = getHeadingId(children)
             return (
-              <h2 {...props} id={id} className="text-3xl font-bold mb-5 mt-8 pb-2 border-b border-gray-200 text-gray-900 scroll-mt-24">
+              <h2 {...props} id={id} className="text-3xl font-medium mb-5 mt-8 pb-2 border-b border-[#E5E1D6] text-[#2F2F2F] scroll-mt-24">
                 {children}
               </h2>
             )
@@ -158,17 +158,17 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
           h3: ({ node, children, ...props }) => {
             const id = getHeadingId(children)
             return (
-              <h3 {...props} id={id} className="text-2xl font-bold mb-4 mt-6 text-gray-900 scroll-mt-24">
+              <h3 {...props} id={id} className="text-2xl font-medium mb-4 mt-6 text-[#2F2F2F] scroll-mt-24">
                 {children}
               </h3>
             )
           },
-          
+
           // Paragraphs
           p: ({ node, ...props }) => (
-            <p {...props} className="text-gray-700 leading-relaxed mb-6 text-base" />
+            <p {...props} className="text-[#3F3F3F] leading-relaxed mb-6 text-base" />
           ),
-          
+
           // Lists
           ul: ({ node, ...props }) => (
             <ul {...props} className="list-disc pl-6 mb-6 space-y-2" />
@@ -177,12 +177,12 @@ export default function MarkdownRenderer({ content, headingIdMap }: MarkdownRend
             <ol {...props} className="list-decimal pl-6 mb-6 space-y-2" />
           ),
           li: ({ node, ...props }) => (
-            <li {...props} className="text-gray-700 leading-relaxed" />
+            <li {...props} className="text-[#3F3F3F] leading-relaxed" />
           ),
-          
+
           // Horizontal rule
           hr: ({ node, ...props }) => (
-            <hr {...props} className="border-gray-300 my-10 border-t-2" />
+            <hr {...props} className="border-[#D4CFC4] my-10 border-t-2" />
           ),
         }}
       >

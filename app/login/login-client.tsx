@@ -32,10 +32,13 @@ export default function LoginClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F1E8] px-4">
-      <div className="max-w-md w-full space-y-6">
-        <h2 className="text-center text-3xl font-bold">ログイン</h2>
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-light text-[#2F2F2F] mb-2">ログイン</h2>
+          <div className="w-10 h-px bg-[#3D3D3D] mx-auto"></div>
+        </div>
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && <p className="text-[#A63A32] text-sm text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -44,7 +47,7 @@ export default function LoginClient() {
             placeholder="メールアドレス"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 bg-white border border-[#D4CFC4] rounded-sm text-[#2F2F2F] placeholder:text-[#9D9D9D] focus:outline-none focus:border-[#3D3D3D] transition-colors"
           />
 
           <input
@@ -53,22 +56,22 @@ export default function LoginClient() {
             placeholder="パスワード"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 bg-white border border-[#D4CFC4] rounded-sm text-[#2F2F2F] placeholder:text-[#9D9D9D] focus:outline-none focus:border-[#3D3D3D] transition-colors"
           />
 
           <button
             disabled={isLoading}
-            className="w-full bg-black text-white p-2 rounded disabled:opacity-50"
+            className="w-full bg-[#3D3D3D] text-white p-3 rounded-sm hover:bg-[#2B2B28] transition-colors disabled:opacity-50 text-sm tracking-wide"
           >
             {isLoading ? 'ログイン中…' : 'ログイン'}
           </button>
         </form>
 
-        <p className="text-center text-sm">
+        <p className="text-center text-sm text-[#5D5D5D]">
           アカウントをお持ちでないですか？{' '}
           <Link
             href={`/register${redirectTo !== '/' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
-            className="underline"
+            className="text-[#3D3D3D] border-b border-[#3D3D3D] hover:text-[#5D5D5D] hover:border-[#5D5D5D] transition-colors"
           >
             新規登録
           </Link>

@@ -145,8 +145,8 @@ export default function AllPostsPage() {
                   onClick={() => router.push('/all')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     !selectedTag
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-[#3D3D3D] hover:bg-gray-100 border border-gray-300'
+                      ? 'bg-[#3E4A61] text-white'
+                      : 'bg-white text-[#3D3D3D] hover:bg-[#F0ECE1] border border-[#D4CFC4]'
                   }`}
                 >
                   All
@@ -157,8 +157,8 @@ export default function AllPostsPage() {
                     onClick={() => handleTagClick(tag)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       selectedTag === tag
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white text-[#3D3D3D] hover:bg-gray-100 border border-gray-300'
+                        ? 'bg-[#3E4A61] text-white'
+                        : 'bg-white text-[#3D3D3D] hover:bg-[#F0ECE1] border border-[#D4CFC4]'
                     }`}
                   >
                     #{tag}
@@ -171,7 +171,7 @@ export default function AllPostsPage() {
                   {' '}
                   <button
                     onClick={() => router.push('/all')}
-                    className="text-indigo-600 hover:text-indigo-800 underline"
+                    className="text-[#3E4A61] hover:text-[#2E3749] underline"
                   >
                     Clear filter
                   </button>
@@ -188,11 +188,11 @@ export default function AllPostsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="space-y-4">
-                  <div className="w-full aspect-[4/3] bg-gray-200 animate-pulse rounded-md"></div>
+                  <div className="w-full aspect-[4/3] bg-[#E5E1D6] animate-pulse rounded-md"></div>
                   <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 animate-pulse w-3/4 rounded"></div>
-                    <div className="h-3 bg-gray-200 animate-pulse w-full rounded"></div>
-                    <div className="h-3 bg-gray-200 animate-pulse w-5/6 rounded"></div>
+                    <div className="h-4 bg-[#E5E1D6] animate-pulse w-3/4 rounded"></div>
+                    <div className="h-3 bg-[#E5E1D6] animate-pulse w-full rounded"></div>
+                    <div className="h-3 bg-[#E5E1D6] animate-pulse w-5/6 rounded"></div>
                   </div>
                 </div>
               ))}
@@ -212,7 +212,7 @@ export default function AllPostsPage() {
                         />
                         {/* View Count Badge - Top Right */}
                         {post.viewCount !== undefined && (
-                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-medium">
+                          <div className="absolute top-3 right-3 bg-[#2B2B28]/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-medium">
                             <svg 
                               className="w-3.5 h-3.5" 
                               fill="none" 
