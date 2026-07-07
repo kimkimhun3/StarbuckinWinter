@@ -8,12 +8,13 @@ export default function MagazineSection() {
   
   const magazines = [
     { title: "Vol.06", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1767347570/1_kicahw.jpg" },
-    { title: "Vol.05", image: "https://images.pexels.com/photos/35111813/pexels-photo-35111813.jpeg" },
-    { title: "Vol.04", image: "https://images.pexels.com/photos/34488286/pexels-photo-34488286.jpeg" },
-    { title: "Vol.03", image: "https://images.pexels.com/photos/34188665/pexels-photo-34188665.jpeg" },
-    { title: "Vol.02", image: "https://images.pexels.com/photos/35171495/pexels-photo-35171495.jpeg" },
-    { title: "Vol.01", image: "https://images.pexels.com/photos/32488229/pexels-photo-32488229.jpeg" },
-    { title: "Vol.00", image: "https://images.pexels.com/photos/35045211/pexels-photo-35045211.jpeg" }
+    { title: "Vol.05", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783438262/IMG_7236_hh2zxf.jpg" },
+    { title: "Vol.04", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783438771/techojpg_qvso1x.jpg" },
+    { title: "Vol.03", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783438276/IMG_7644_mkyuty.jpg" },
+    { title: "Vol.02", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783439055/IMG_4648_fg9ibe.jpg" },
+    { title: "Vol.01", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783438242/IMG_8579_a3oqov.jpg" },
+    { title: "Vol.00", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783439238/okayamacastle_d5tlnz.jpg" },
+    { title: "Vol.000", image: "https://res.cloudinary.com/duvusa8ck/image/upload/v1783439356/IMG_6933_vjo9li.jpg" }
   ];
 
   const openLightbox = (index: number) => {
@@ -82,9 +83,9 @@ export default function MagazineSection() {
           <div className="relative aspect-[3/4] bg-[#F0ECE1] rounded-sm border border-[#D4CFC4] flex items-center justify-center">
             <p className="text-[#9D9D9D] text-sm tracking-wide">Coming Soon</p>
           </div>
-          <div className="relative aspect-[3/4] bg-[#F0ECE1] rounded-sm border border-[#D4CFC4] flex items-center justify-center">
+          {/* <div className="relative aspect-[3/4] bg-[#F0ECE1] rounded-sm border border-[#D4CFC4] flex items-center justify-center">
             <p className="text-[#9D9D9D] text-sm tracking-wide">Coming Soon</p>
-          </div>
+          </div> */}
         </div>
 
         {/* Shop Link */}
