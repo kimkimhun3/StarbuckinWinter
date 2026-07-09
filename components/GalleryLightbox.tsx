@@ -58,19 +58,19 @@ export default function GalleryLightbox({
       </button>
 
       <div
-        className="relative w-full max-w-5xl my-auto"
+        className="relative w-full max-w-sm sm:max-w-2xl lg:max-w-4xl my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-5 sm:gap-6 md:gap-8 items-start">
           {/* Left: image gallery */}
           <div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-[#1f1f1d]">
+            <div className="relative overflow-hidden rounded-sm bg-[#1f1f1d] flex items-center justify-center">
               {images[activeImage] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={images[activeImage]}
                   alt={`${entry.title} ${activeImage + 1}`}
-                  className="w-full h-full object-contain"
+                  className="w-auto h-auto max-w-full max-h-[38vh] sm:max-h-[48vh] lg:max-h-[58vh] object-contain"
                 />
               )}
 
