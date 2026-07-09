@@ -907,7 +907,7 @@ export default function BlogPostClient({ slug, initialPost }: BlogPostClientProp
         {/* Back to Blog Link */}
         <div className="mb-12 text-center">
           <Link
-            href="/blog"
+            href="/all"
             className="inline-flex items-center text-[#3E4A61] hover:text-[#2E3749] font-medium transition-colors group"
           >
             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

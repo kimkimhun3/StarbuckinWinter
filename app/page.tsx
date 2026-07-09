@@ -14,8 +14,8 @@ export default function HomePage() {
   return (
     <main className="bg-[#F5F1E8]">
       <Hero />
-      <IntroSection />
       <HousesSection />
+      <IntroSection />
       <ProfilesSection />
       <MomentSection />
       <RandomMessageSection />

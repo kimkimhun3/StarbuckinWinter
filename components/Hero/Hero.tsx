@@ -130,19 +130,19 @@ export default function Hero() {
           >
             {/* Image 3 - First set */}
             <img
-              src="https://i1.wp.com/visitmatsumoto.com/wp-content/uploads/2018/01/DSC00687_DxO.jpg?fit=1024%2C628&ssl=1"
+              src="https://www.orion-ski.jp/magazine/wp-content/uploads/2020/03/20030701.jpg"
               alt="Mt. Fuji landscape"
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                 rightImageSet === 0 ? 'opacity-100' : 'opacity-0'
               } animate-fadeInRight`}
               style={{ 
-                animationDelay: '1.2s',
+                animationDelay: '0.6s',
                 animationFillMode: 'forwards'
               }}
             />
             {/* Image 6 - Second set */}
             <img
-              src="https://japanspecialist.com/documents/d/japanspecialist/9-hokkaido-in-winter-body"
+              src="https://images5.alphacoders.com/109/1094882.jpg"
               alt="Hokkaido in winter"
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                 rightImageSet === 1 ? 'opacity-100' : 'opacity-0'
