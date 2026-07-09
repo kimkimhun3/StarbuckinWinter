@@ -5,6 +5,7 @@ import IntroSection from '@/components/Sections/IntroSection'
 import HousesSection from '@/components/Sections/HousesSection'
 import ProfilesSection from '@/components/Sections/ProfilesSection'
 import MagazineSection from '@/components/Sections/MagazineSection'
+import RandomMessageSection from '@/components/Sections/RandomMessageSection'
 import SchoolSection from '@/components/Sections/SchoolSection'
 import Footer from '@/components/Sections/Footer'
 import '@/styles/globals.css'
@@ -17,6 +18,7 @@ export default function HomePage() {
       <IntroSection />
       <ProfilesSection />
       <MagazineSection />
+      <RandomMessageSection />
       <SchoolSection />
       <Footer />
     </main>

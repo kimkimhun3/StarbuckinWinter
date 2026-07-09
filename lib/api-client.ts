@@ -139,6 +139,58 @@ export class ApiClient {
     })
   }
 
+  // Random Messages ("A Random Message" section)
+  async getRandomMessages(all = false) {
+    return this.request(`/api/random-messages${all ? '?all=true' : ''}`)
+  }
+
+  async getPublicRandomMessages() {
+    return this.request('/api/random-messages')
+  }
+
+  async getRandomMessage(id: string) {
+    return this.request(`/api/random-messages/${id}`)
+  }
+
+  async createRandomMessage(data: {
+    title: string
+    description?: string
+    coverImage: string
+    memo?: string
+    images?: string[]
+    published?: boolean
+    order?: number
+  }) {
+    return this.request('/api/random-messages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateRandomMessage(
+    id: string,
+    data: {
+      title: string
+      description?: string
+      coverImage: string
+      memo?: string
+      images?: string[]
+      published?: boolean
+      order?: number
+    }
+  ) {
+    return this.request(`/api/random-messages/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteRandomMessage(id: string) {
+    return this.request(`/api/random-messages/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
   // Analytics
   async trackPageView(path: string, postId?: string) {
     return this.request('/api/analytics/track', {
