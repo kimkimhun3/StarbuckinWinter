@@ -7,7 +7,7 @@ import GalleryEntryForm, {
   GalleryEntryFormValues,
 } from '@/components/admin/GalleryEntryForm'
 
-export default function NewRandomMessagePage() {
+export default function NewMomentPage() {
   const { token } = useAuth()
   const router = useRouter()
 
@@ -15,20 +15,20 @@ export default function NewRandomMessagePage() {
     if (token) {
       apiClient.setToken(token)
     }
-    await apiClient.createRandomMessage(values)
-    router.push('/admin/messages')
+    await apiClient.createMoment(values)
+    router.push('/admin/moments')
   }
 
   return (
     <GalleryEntryForm
-      heading="New Message"
-      subheading="Add a place with a photo, a short description, gallery images and an optional memo"
-      cancelHref="/admin/messages"
+      heading="New Moment"
+      subheading="Add a photo with a title, gallery images and an optional message"
+      cancelHref="/admin/moments"
       submitLabel="Create"
-      titleLabel="Place / Title"
-      titlePlaceholder="e.g., Mt. Takao summit"
-      memoLabel="Memo (the message — optional)"
-      memoPlaceholder="What the hiker wrote in the notebook. Leave empty if none yet."
+      titleLabel="Title / Caption"
+      titlePlaceholder="e.g., Vol.06"
+      memoLabel="Message (optional)"
+      memoPlaceholder="A note about this moment. Leave empty if none."
       initialValues={{
         title: '',
         description: '',

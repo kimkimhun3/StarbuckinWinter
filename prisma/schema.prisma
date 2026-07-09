@@ -96,3 +96,22 @@ model RandomMessage {
 
   @@index([published])
 }
+
+// Moment - photos captured along the road ("Moments, Captured" section).
+// Same shape as RandomMessage: a cover picture + short description on the
+// card, plus a gallery of extra pictures and an optional message revealed
+// when the card is opened.
+model Moment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  coverImage  String
+  memo        String?  @db.Text
+  images      String[]
+  published   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+}

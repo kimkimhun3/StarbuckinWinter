@@ -20,6 +20,9 @@ export default function Navigation() {
         <Link href="#house" className="block hover:text-[#3D3D3D] transition-colors duration-300">
           ＞ ゆっくりでいい
         </Link>
+        <Link href="#messages" className="block hover:text-[#3D3D3D] transition-colors duration-300">
+          ＞ だれかのことば
+        </Link>
         <Link href="/all" className="block hover:text-[#3D3D3D] transition-colors duration-300">
           ＞ ここにのこるもの
         </Link>

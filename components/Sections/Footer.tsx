@@ -21,6 +21,9 @@ export default function Footer() {
             <Link href="#house" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
               ゆっくりでいい
             </Link>
+            <Link href="#messages" className="block text-[#5D5D5D] hover:text-[#3D3D3D] transition-colors">
+              だれかのことば
+            </Link>
           </div>
 
           {/* Social Links */}

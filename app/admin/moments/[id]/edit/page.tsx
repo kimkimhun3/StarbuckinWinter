@@ -8,7 +8,7 @@ import GalleryEntryForm, {
   GalleryEntryFormValues,
 } from '@/components/admin/GalleryEntryForm'
 
-export default function EditRandomMessagePage({
+export default function EditMomentPage({
   params,
 }: {
   params: Promise<{ id: string }>
@@ -23,31 +23,31 @@ export default function EditRandomMessagePage({
   useEffect(() => {
     if (token) {
       apiClient.setToken(token)
-      loadMessage()
+      loadMoment()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, id])
 
-  const loadMessage = async () => {
+  const loadMoment = async () => {
     try {
-      const { message } = await apiClient.getRandomMessage(id)
+      const { moment } = await apiClient.getMoment(id)
       setInitialValues({
-        title: message.title || '',
-        description: message.description || '',
-        coverImage: message.coverImage || '',
-        memo: message.memo || '',
-        images: message.images || [],
-        published: message.published,
+        title: moment.title || '',
+        description: moment.description || '',
+        coverImage: moment.coverImage || '',
+        memo: moment.memo || '',
+        images: moment.images || [],
+        published: moment.published,
       })
     } catch (err) {
-      setError('Failed to load message')
+      setError('Failed to load moment')
       console.error('Load error:', err)
     }
   }
 
   const handleSubmit = async (values: GalleryEntryFormValues) => {
-    await apiClient.updateRandomMessage(id, values)
-    router.push('/admin/messages')
+    await apiClient.updateMoment(id, values)
+    router.push('/admin/moments')
   }
 
   if (error) {
@@ -68,14 +68,14 @@ export default function EditRandomMessagePage({
 
   return (
     <GalleryEntryForm
-      heading="Edit Message"
-      subheading="Update this place, its gallery images and memo"
-      cancelHref="/admin/messages"
+      heading="Edit Moment"
+      subheading="Update this moment, its gallery images and message"
+      cancelHref="/admin/moments"
       submitLabel="Save changes"
-      titleLabel="Place / Title"
-      titlePlaceholder="e.g., Mt. Takao summit"
-      memoLabel="Memo (the message — optional)"
-      memoPlaceholder="What the hiker wrote in the notebook. Leave empty if none yet."
+      titleLabel="Title / Caption"
+      titlePlaceholder="e.g., Vol.06"
+      memoLabel="Message (optional)"
+      memoPlaceholder="A note about this moment. Leave empty if none."
       initialValues={initialValues}
       onSubmit={handleSubmit}
     />

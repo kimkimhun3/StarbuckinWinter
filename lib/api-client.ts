@@ -191,6 +191,58 @@ export class ApiClient {
     })
   }
 
+  // Moments ("Moments, Captured" section)
+  async getMoments(all = false) {
+    return this.request(`/api/moments${all ? '?all=true' : ''}`)
+  }
+
+  async getPublicMoments() {
+    return this.request('/api/moments')
+  }
+
+  async getMoment(id: string) {
+    return this.request(`/api/moments/${id}`)
+  }
+
+  async createMoment(data: {
+    title: string
+    description?: string
+    coverImage: string
+    memo?: string
+    images?: string[]
+    published?: boolean
+    order?: number
+  }) {
+    return this.request('/api/moments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateMoment(
+    id: string,
+    data: {
+      title: string
+      description?: string
+      coverImage: string
+      memo?: string
+      images?: string[]
+      published?: boolean
+      order?: number
+    }
+  ) {
+    return this.request(`/api/moments/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteMoment(id: string) {
+    return this.request(`/api/moments/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
   // Analytics
   async trackPageView(path: string, postId?: string) {
     return this.request('/api/analytics/track', {
