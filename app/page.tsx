@@ -4,7 +4,7 @@ import Hero from '@/components/Hero/Hero'
 import IntroSection from '@/components/Sections/IntroSection'
 import HousesSection from '@/components/Sections/HousesSection'
 import ProfilesSection from '@/components/Sections/ProfilesSection'
-import MagazineSection from '@/components/Sections/MagazineSection'
+import MomentSection from '@/components/Sections/MomentSection'
 import RandomMessageSection from '@/components/Sections/RandomMessageSection'
 import SchoolSection from '@/components/Sections/SchoolSection'
 import Footer from '@/components/Sections/Footer'
@@ -17,7 +17,7 @@ export default function HomePage() {
       <IntroSection />
       <HousesSection />
       <ProfilesSection />
-      <MagazineSection />
+      <MomentSection />
       <RandomMessageSection />
       <SchoolSection />
       <Footer />

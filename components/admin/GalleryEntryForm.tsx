@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-export interface RandomMessageFormValues {
+export interface GalleryEntryFormValues {
   title: string
   description: string
   coverImage: string
@@ -12,29 +12,40 @@ export interface RandomMessageFormValues {
   published: boolean
 }
 
-interface RandomMessageFormProps {
+interface GalleryEntryFormProps {
   heading: string
   subheading: string
-  initialValues: RandomMessageFormValues
+  cancelHref: string
+  initialValues: GalleryEntryFormValues
   submitLabel: string
-  onSubmit: (values: RandomMessageFormValues) => Promise<void>
+  onSubmit: (values: GalleryEntryFormValues) => Promise<void>
+  // Optional per-section copy
+  titleLabel?: string
+  titlePlaceholder?: string
+  memoLabel?: string
+  memoPlaceholder?: string
 }
 
 const inputClass =
   'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border'
 
-export default function RandomMessageForm({
+export default function GalleryEntryForm({
   heading,
   subheading,
+  cancelHref,
   initialValues,
   submitLabel,
   onSubmit,
-}: RandomMessageFormProps) {
-  const [values, setValues] = useState<RandomMessageFormValues>(initialValues)
+  titleLabel = 'Title',
+  titlePlaceholder = 'e.g., Mt. Takao summit',
+  memoLabel = 'Message (optional)',
+  memoPlaceholder = 'A message to show when the card is opened. Leave empty if none yet.',
+}: GalleryEntryFormProps) {
+  const [values, setValues] = useState<GalleryEntryFormValues>(initialValues)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const update = (patch: Partial<RandomMessageFormValues>) =>
+  const update = (patch: Partial<GalleryEntryFormValues>) =>
     setValues((prev) => ({ ...prev, ...patch }))
 
   const updateImage = (index: number, url: string) => {
@@ -79,7 +90,7 @@ export default function RandomMessageForm({
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <Link
-            href="/admin/messages"
+            href={cancelHref}
             className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
           >
             Cancel
@@ -96,17 +107,17 @@ export default function RandomMessageForm({
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6 space-y-6">
-            {/* Title / place name */}
+            {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Place / Title *
+                {titleLabel} *
               </label>
               <input
                 type="text"
                 id="title"
                 required
                 className={inputClass}
-                placeholder="e.g., Mt. Takao summit"
+                placeholder={titlePlaceholder}
                 value={values.title}
                 onChange={(e) => update({ title: e.target.value })}
               />
@@ -151,16 +162,16 @@ export default function RandomMessageForm({
               )}
             </div>
 
-            {/* Memo (the handwritten message — optional) */}
+            {/* Memo / message (optional) */}
             <div>
               <label htmlFor="memo" className="block text-sm font-medium text-gray-700">
-                Memo (the message — optional)
+                {memoLabel}
               </label>
               <textarea
                 id="memo"
                 rows={4}
                 className={inputClass}
-                placeholder="What the hiker wrote in the notebook. Leave empty if none yet."
+                placeholder={memoPlaceholder}
                 value={values.memo}
                 onChange={(e) => update({ memo: e.target.value })}
               />
