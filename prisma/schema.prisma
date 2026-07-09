@@ -77,3 +77,22 @@ model PageView {
   @@index([country])
   @@index([path])
 }
+
+// A Random Message - notes hikers write in the notebook during hikes.
+// Each entry is a "place": one cover picture + a short description shown on
+// the card, plus a gallery of extra pictures and a handwritten memo revealed
+// when the card is opened.
+model RandomMessage {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  coverImage  String
+  memo        String?  @db.Text
+  images      String[]
+  published   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+}
